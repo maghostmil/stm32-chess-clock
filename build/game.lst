@@ -1,0 +1,773 @@
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"game.c"
+  12              		.text
+  13              	.Ltext0:
+  14              		.cfi_sections	.debug_frame
+  15              		.section	.text.setTimeForBothPlayers,"ax",%progbits
+  16              		.align	1
+  17              		.global	setTimeForBothPlayers
+  18              		.arch armv7-m
+  19              		.syntax unified
+  20              		.thumb
+  21              		.thumb_func
+  22              		.fpu softvfp
+  24              	setTimeForBothPlayers:
+  25              	.LVL0:
+  26              	.LFB66:
+  27              		.file 1 "Src/game.c"
+   1:Src/game.c    **** #include "game.h"
+   2:Src/game.c    **** 
+   3:Src/game.c    **** #include "stm32f1xx_hal.h"
+   4:Src/game.c    **** #include "tim.h"
+   5:Src/game.c    **** #include "stm32_tm1637.h"
+   6:Src/game.c    **** #include "mode.h"
+   7:Src/game.c    **** 
+   8:Src/game.c    **** //Procedures
+   9:Src/game.c    **** 
+  10:Src/game.c    **** void setTimeForBothPlayers (game_t *game) 
+  11:Src/game.c    **** {
+  28              		.loc 1 11 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  12:Src/game.c    ****     game->times[PLAYER1].minutes = game->startTime.minutes;
+  33              		.loc 1 12 5 view .LVU1
+  34              		.loc 1 12 51 is_stmt 0 view .LVU2
+  35 0000 4378     		ldrb	r3, [r0, #1]	@ zero_extendqisi2
+  36 0002 DBB2     		uxtb	r3, r3
+  37              		.loc 1 12 34 view .LVU3
+  38 0004 0371     		strb	r3, [r0, #4]
+  13:Src/game.c    ****     game->times[PLAYER1].seconds = game->startTime.seconds;
+  39              		.loc 1 13 5 is_stmt 1 view .LVU4
+  40              		.loc 1 13 51 is_stmt 0 view .LVU5
+  41 0006 8378     		ldrb	r3, [r0, #2]	@ zero_extendqisi2
+  42 0008 DBB2     		uxtb	r3, r3
+  43              		.loc 1 13 34 view .LVU6
+  44 000a 4371     		strb	r3, [r0, #5]
+  14:Src/game.c    **** 
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s 			page 2
+
+
+  15:Src/game.c    ****     game->times[PLAYER2].minutes = game->startTime.minutes;
+  45              		.loc 1 15 5 is_stmt 1 view .LVU7
+  46              		.loc 1 15 51 is_stmt 0 view .LVU8
+  47 000c 4378     		ldrb	r3, [r0, #1]	@ zero_extendqisi2
+  48 000e DBB2     		uxtb	r3, r3
+  49              		.loc 1 15 34 view .LVU9
+  50 0010 8371     		strb	r3, [r0, #6]
+  16:Src/game.c    ****     game->times[PLAYER2].seconds = game->startTime.seconds;
+  51              		.loc 1 16 5 is_stmt 1 view .LVU10
+  52              		.loc 1 16 51 is_stmt 0 view .LVU11
+  53 0012 8378     		ldrb	r3, [r0, #2]	@ zero_extendqisi2
+  54 0014 DBB2     		uxtb	r3, r3
+  55              		.loc 1 16 34 view .LVU12
+  56 0016 C371     		strb	r3, [r0, #7]
+  17:Src/game.c    **** }
+  57              		.loc 1 17 1 view .LVU13
+  58 0018 7047     		bx	lr
+  59              		.cfi_endproc
+  60              	.LFE66:
+  62              		.section	.text.gameInit,"ax",%progbits
+  63              		.align	1
+  64              		.global	gameInit
+  65              		.syntax unified
+  66              		.thumb
+  67              		.thumb_func
+  68              		.fpu softvfp
+  70              	gameInit:
+  71              	.LVL1:
+  72              	.LFB67:
+  18:Src/game.c    **** 
+  19:Src/game.c    **** void gameInit (game_t *game) 
+  20:Src/game.c    **** {
+  73              		.loc 1 20 1 is_stmt 1 view -0
+  74              		.cfi_startproc
+  75              		@ args = 0, pretend = 0, frame = 0
+  76              		@ frame_needed = 0, uses_anonymous_args = 0
+  77              		.loc 1 20 1 is_stmt 0 view .LVU15
+  78 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  79              	.LCFI0:
+  80              		.cfi_def_cfa_offset 20
+  81              		.cfi_offset 4, -20
+  82              		.cfi_offset 5, -16
+  83              		.cfi_offset 6, -12
+  84              		.cfi_offset 7, -8
+  85              		.cfi_offset 14, -4
+  86 0002 83B0     		sub	sp, sp, #12
+  87              	.LCFI1:
+  88              		.cfi_def_cfa_offset 32
+  89 0004 0546     		mov	r5, r0
+  21:Src/game.c    ****     //1. Set game mode
+  22:Src/game.c    ****     mode = GAME;
+  90              		.loc 1 22 5 is_stmt 1 view .LVU16
+  91              		.loc 1 22 10 is_stmt 0 view .LVU17
+  92 0006 0127     		movs	r7, #1
+  93 0008 134B     		ldr	r3, .L4
+  94 000a 1F70     		strb	r7, [r3]
+  23:Src/game.c    ****     
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s 			page 3
+
+
+  24:Src/game.c    ****     //2. Set game state to not started
+  25:Src/game.c    ****     game->state = NOT_STARTED;
+  95              		.loc 1 25 5 is_stmt 1 view .LVU18
+  96              		.loc 1 25 17 is_stmt 0 view .LVU19
+  97 000c 0023     		movs	r3, #0
+  98 000e 0370     		strb	r3, [r0]
+  26:Src/game.c    **** 
+  27:Src/game.c    ****     //3. Set time for both players from game start time
+  28:Src/game.c    ****     setTimeForBothPlayers(game);
+  99              		.loc 1 28 5 is_stmt 1 view .LVU20
+ 100 0010 FFF7FEFF 		bl	setTimeForBothPlayers
+ 101              	.LVL2:
+  29:Src/game.c    **** 
+  30:Src/game.c    ****     //4. Set current player
+  31:Src/game.c    ****     game->currentPlayer = !HAL_GPIO_ReadPin(SIDE_KEY_GPIO_Port, SIDE_KEY_Pin);
+ 102              		.loc 1 31 5 view .LVU21
+ 103              		.loc 1 31 28 is_stmt 0 view .LVU22
+ 104 0014 8021     		movs	r1, #128
+ 105 0016 1148     		ldr	r0, .L4+4
+ 106 0018 FFF7FEFF 		bl	HAL_GPIO_ReadPin
+ 107              	.LVL3:
+ 108              		.loc 1 31 27 view .LVU23
+ 109 001c B0FA80F0 		clz	r0, r0
+ 110 0020 4009     		lsrs	r0, r0, #5
+ 111              		.loc 1 31 25 view .LVU24
+ 112 0022 2872     		strb	r0, [r5, #8]
+  32:Src/game.c    **** 
+  33:Src/game.c    ****     //5.Display times
+  34:Src/game.c    ****     tm1637DisplayDecimal(display[0], game->times[PLAYER1].minutes*100 + game->times[PLAYER1].second
+ 113              		.loc 1 34 5 is_stmt 1 view .LVU25
+ 114              		.loc 1 34 58 is_stmt 0 view .LVU26
+ 115 0024 2B79     		ldrb	r3, [r5, #4]	@ zero_extendqisi2
+ 116              		.loc 1 34 66 view .LVU27
+ 117 0026 6426     		movs	r6, #100
+ 118              		.loc 1 34 93 view .LVU28
+ 119 0028 6A79     		ldrb	r2, [r5, #5]	@ zero_extendqisi2
+ 120              		.loc 1 34 5 view .LVU29
+ 121 002a 0D4C     		ldr	r4, .L4+8
+ 122 002c 0197     		str	r7, [sp, #4]
+ 123 002e 03FB0623 		mla	r3, r3, r6, r2
+ 124 0032 0093     		str	r3, [sp]
+ 125 0034 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 126 0038 FFF7FEFF 		bl	tm1637DisplayDecimal
+ 127              	.LVL4:
+  35:Src/game.c    ****     tm1637DisplayDecimal(display[1], game->times[PLAYER2].minutes*100 + game->times[PLAYER2].second
+ 128              		.loc 1 35 5 is_stmt 1 view .LVU30
+ 129              		.loc 1 35 58 is_stmt 0 view .LVU31
+ 130 003c AA79     		ldrb	r2, [r5, #6]	@ zero_extendqisi2
+ 131              		.loc 1 35 93 view .LVU32
+ 132 003e EB79     		ldrb	r3, [r5, #7]	@ zero_extendqisi2
+ 133              		.loc 1 35 5 view .LVU33
+ 134 0040 0197     		str	r7, [sp, #4]
+ 135 0042 02FB0636 		mla	r6, r2, r6, r3
+ 136 0046 0096     		str	r6, [sp]
+ 137 0048 1034     		adds	r4, r4, #16
+ 138 004a 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 139 004e FFF7FEFF 		bl	tm1637DisplayDecimal
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s 			page 4
+
+
+ 140              	.LVL5:
+  36:Src/game.c    **** }
+ 141              		.loc 1 36 1 view .LVU34
+ 142 0052 03B0     		add	sp, sp, #12
+ 143              	.LCFI2:
+ 144              		.cfi_def_cfa_offset 20
+ 145              		@ sp needed
+ 146 0054 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 147              	.LVL6:
+ 148              	.L5:
+ 149              		.loc 1 36 1 view .LVU35
+ 150 0056 00BF     		.align	2
+ 151              	.L4:
+ 152 0058 00000000 		.word	mode
+ 153 005c 000C0140 		.word	1073810432
+ 154 0060 00000000 		.word	display
+ 155              		.cfi_endproc
+ 156              	.LFE67:
+ 158              		.section	.text.decrementTimeForActivePlayer,"ax",%progbits
+ 159              		.align	1
+ 160              		.global	decrementTimeForActivePlayer
+ 161              		.syntax unified
+ 162              		.thumb
+ 163              		.thumb_func
+ 164              		.fpu softvfp
+ 166              	decrementTimeForActivePlayer:
+ 167              	.LVL7:
+ 168              	.LFB68:
+  37:Src/game.c    **** 
+  38:Src/game.c    **** void decrementTimeForActivePlayer (game_t *game)
+  39:Src/game.c    **** {
+ 169              		.loc 1 39 1 is_stmt 1 view -0
+ 170              		.cfi_startproc
+ 171              		@ args = 0, pretend = 0, frame = 0
+ 172              		@ frame_needed = 0, uses_anonymous_args = 0
+ 173              		.loc 1 39 1 is_stmt 0 view .LVU37
+ 174 0000 30B5     		push	{r4, r5, lr}
+ 175              	.LCFI3:
+ 176              		.cfi_def_cfa_offset 12
+ 177              		.cfi_offset 4, -12
+ 178              		.cfi_offset 5, -8
+ 179              		.cfi_offset 14, -4
+ 180 0002 83B0     		sub	sp, sp, #12
+ 181              	.LCFI4:
+ 182              		.cfi_def_cfa_offset 24
+  40:Src/game.c    ****     player_t currentPlayer = game->currentPlayer;
+ 183              		.loc 1 40 5 is_stmt 1 view .LVU38
+ 184              		.loc 1 40 14 is_stmt 0 view .LVU39
+ 185 0004 037A     		ldrb	r3, [r0, #8]	@ zero_extendqisi2
+ 186 0006 DDB2     		uxtb	r5, r3
+ 187              	.LVL8:
+  41:Src/game.c    **** 
+  42:Src/game.c    ****     if(game->state == STARTED) 
+ 188              		.loc 1 42 5 is_stmt 1 view .LVU40
+ 189              		.loc 1 42 12 is_stmt 0 view .LVU41
+ 190 0008 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 191 000a DBB2     		uxtb	r3, r3
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s 			page 5
+
+
+ 192              		.loc 1 42 7 view .LVU42
+ 193 000c 012B     		cmp	r3, #1
+ 194 000e 01D0     		beq	.L12
+ 195              	.LVL9:
+ 196              	.L6:
+  43:Src/game.c    ****     {
+  44:Src/game.c    ****         if (game->times[currentPlayer].seconds == 0) 
+  45:Src/game.c    ****         {
+  46:Src/game.c    ****             if (game->times[currentPlayer].minutes == 0) {
+  47:Src/game.c    ****                 //Times Gone! Game ended
+  48:Src/game.c    ****                 HAL_TIM_Base_Stop_IT(&htim1);
+  49:Src/game.c    ****                 game->state = ENDED;
+  50:Src/game.c    ****             } 
+  51:Src/game.c    ****             else 
+  52:Src/game.c    ****             {
+  53:Src/game.c    ****                 game->times[currentPlayer].seconds = 59;
+  54:Src/game.c    ****                 game->times[currentPlayer].minutes --;
+  55:Src/game.c    ****             }
+  56:Src/game.c    ****         } 
+  57:Src/game.c    ****         else 
+  58:Src/game.c    ****         {
+  59:Src/game.c    ****             game->times[currentPlayer].seconds --;
+  60:Src/game.c    ****         }
+  61:Src/game.c    **** 
+  62:Src/game.c    ****         tm1637DisplayDecimal(display[currentPlayer], game->times[currentPlayer].minutes*100 + game-
+  63:Src/game.c    ****     }
+  64:Src/game.c    **** }
+ 197              		.loc 1 64 1 view .LVU43
+ 198 0010 03B0     		add	sp, sp, #12
+ 199              	.LCFI5:
+ 200              		.cfi_remember_state
+ 201              		.cfi_def_cfa_offset 12
+ 202              		@ sp needed
+ 203 0012 30BD     		pop	{r4, r5, pc}
+ 204              	.LVL10:
+ 205              	.L12:
+ 206              	.LCFI6:
+ 207              		.cfi_restore_state
+ 208              		.loc 1 64 1 view .LVU44
+ 209 0014 0446     		mov	r4, r0
+  44:Src/game.c    ****         {
+ 210              		.loc 1 44 9 is_stmt 1 view .LVU45
+  44:Src/game.c    ****         {
+ 211              		.loc 1 44 39 is_stmt 0 view .LVU46
+ 212 0016 00EB4503 		add	r3, r0, r5, lsl #1
+ 213 001a 5B79     		ldrb	r3, [r3, #5]	@ zero_extendqisi2
+  44:Src/game.c    ****         {
+ 214              		.loc 1 44 12 view .LVU47
+ 215 001c 93B9     		cbnz	r3, .L8
+  46:Src/game.c    ****                 //Times Gone! Game ended
+ 216              		.loc 1 46 13 is_stmt 1 view .LVU48
+  46:Src/game.c    ****                 //Times Gone! Game ended
+ 217              		.loc 1 46 43 is_stmt 0 view .LVU49
+ 218 001e 00EB4503 		add	r3, r0, r5, lsl #1
+ 219 0022 1B79     		ldrb	r3, [r3, #4]	@ zero_extendqisi2
+  46:Src/game.c    ****                 //Times Gone! Game ended
+ 220              		.loc 1 46 16 view .LVU50
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s 			page 6
+
+
+ 221 0024 43B1     		cbz	r3, .L13
+  53:Src/game.c    ****                 game->times[currentPlayer].minutes --;
+ 222              		.loc 1 53 17 is_stmt 1 view .LVU51
+  53:Src/game.c    ****                 game->times[currentPlayer].minutes --;
+ 223              		.loc 1 53 52 is_stmt 0 view .LVU52
+ 224 0026 00EB4503 		add	r3, r0, r5, lsl #1
+ 225 002a 3B22     		movs	r2, #59
+ 226 002c 5A71     		strb	r2, [r3, #5]
+  54:Src/game.c    ****             }
+ 227              		.loc 1 54 17 is_stmt 1 view .LVU53
+  54:Src/game.c    ****             }
+ 228              		.loc 1 54 43 is_stmt 0 view .LVU54
+ 229 002e 1A79     		ldrb	r2, [r3, #4]	@ zero_extendqisi2
+  54:Src/game.c    ****             }
+ 230              		.loc 1 54 52 view .LVU55
+ 231 0030 013A     		subs	r2, r2, #1
+ 232 0032 D2B2     		uxtb	r2, r2
+ 233 0034 1A71     		strb	r2, [r3, #4]
+ 234 0036 0BE0     		b	.L10
+ 235              	.L13:
+  48:Src/game.c    ****                 game->state = ENDED;
+ 236              		.loc 1 48 17 is_stmt 1 view .LVU56
+ 237 0038 1048     		ldr	r0, .L14
+ 238              	.LVL11:
+  48:Src/game.c    ****                 game->state = ENDED;
+ 239              		.loc 1 48 17 is_stmt 0 view .LVU57
+ 240 003a FFF7FEFF 		bl	HAL_TIM_Base_Stop_IT
+ 241              	.LVL12:
+  49:Src/game.c    ****             } 
+ 242              		.loc 1 49 17 is_stmt 1 view .LVU58
+  49:Src/game.c    ****             } 
+ 243              		.loc 1 49 29 is_stmt 0 view .LVU59
+ 244 003e 0323     		movs	r3, #3
+ 245 0040 2370     		strb	r3, [r4]
+ 246 0042 05E0     		b	.L10
+ 247              	.LVL13:
+ 248              	.L8:
+  59:Src/game.c    ****         }
+ 249              		.loc 1 59 13 is_stmt 1 view .LVU60
+  59:Src/game.c    ****         }
+ 250              		.loc 1 59 39 is_stmt 0 view .LVU61
+ 251 0044 00EB4502 		add	r2, r0, r5, lsl #1
+ 252 0048 5379     		ldrb	r3, [r2, #5]	@ zero_extendqisi2
+  59:Src/game.c    ****         }
+ 253              		.loc 1 59 48 view .LVU62
+ 254 004a 013B     		subs	r3, r3, #1
+ 255 004c DBB2     		uxtb	r3, r3
+ 256 004e 5371     		strb	r3, [r2, #5]
+ 257              	.LVL14:
+ 258              	.L10:
+  62:Src/game.c    ****     }
+ 259              		.loc 1 62 9 is_stmt 1 view .LVU63
+  62:Src/game.c    ****     }
+ 260              		.loc 1 62 80 is_stmt 0 view .LVU64
+ 261 0050 04EB4504 		add	r4, r4, r5, lsl #1
+ 262              	.LVL15:
+  62:Src/game.c    ****     }
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s 			page 7
+
+
+ 263              		.loc 1 62 80 view .LVU65
+ 264 0054 2079     		ldrb	r0, [r4, #4]	@ zero_extendqisi2
+  62:Src/game.c    ****     }
+ 265              		.loc 1 62 121 view .LVU66
+ 266 0056 6179     		ldrb	r1, [r4, #5]	@ zero_extendqisi2
+  62:Src/game.c    ****     }
+ 267              		.loc 1 62 158 view .LVU67
+ 268 0058 6279     		ldrb	r2, [r4, #5]	@ zero_extendqisi2
+  62:Src/game.c    ****     }
+ 269              		.loc 1 62 9 view .LVU68
+ 270 005a 094B     		ldr	r3, .L14+4
+ 271 005c 03EB0513 		add	r3, r3, r5, lsl #4
+ 272 0060 82F00102 		eor	r2, r2, #1
+ 273 0064 02F00102 		and	r2, r2, #1
+ 274 0068 0192     		str	r2, [sp, #4]
+ 275 006a 6422     		movs	r2, #100
+ 276 006c 00FB0212 		mla	r2, r0, r2, r1
+ 277 0070 0092     		str	r2, [sp]
+ 278 0072 0FCB     		ldm	r3, {r0, r1, r2, r3}
+ 279 0074 FFF7FEFF 		bl	tm1637DisplayDecimal
+ 280              	.LVL16:
+ 281              		.loc 1 64 1 view .LVU69
+ 282 0078 CAE7     		b	.L6
+ 283              	.L15:
+ 284 007a 00BF     		.align	2
+ 285              	.L14:
+ 286 007c 00000000 		.word	htim1
+ 287 0080 00000000 		.word	display
+ 288              		.cfi_endproc
+ 289              	.LFE68:
+ 291              		.section	.text.switchCurrentPlayer,"ax",%progbits
+ 292              		.align	1
+ 293              		.global	switchCurrentPlayer
+ 294              		.syntax unified
+ 295              		.thumb
+ 296              		.thumb_func
+ 297              		.fpu softvfp
+ 299              	switchCurrentPlayer:
+ 300              	.LVL17:
+ 301              	.LFB69:
+  65:Src/game.c    **** 
+  66:Src/game.c    **** void switchCurrentPlayer (game_t *game) 
+  67:Src/game.c    **** {
+ 302              		.loc 1 67 1 is_stmt 1 view -0
+ 303              		.cfi_startproc
+ 304              		@ args = 0, pretend = 0, frame = 0
+ 305              		@ frame_needed = 0, uses_anonymous_args = 0
+ 306              		.loc 1 67 1 is_stmt 0 view .LVU71
+ 307 0000 30B5     		push	{r4, r5, lr}
+ 308              	.LCFI7:
+ 309              		.cfi_def_cfa_offset 12
+ 310              		.cfi_offset 4, -12
+ 311              		.cfi_offset 5, -8
+ 312              		.cfi_offset 14, -4
+ 313 0002 83B0     		sub	sp, sp, #12
+ 314              	.LCFI8:
+ 315              		.cfi_def_cfa_offset 24
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s 			page 8
+
+
+ 316 0004 0446     		mov	r4, r0
+  68:Src/game.c    ****     player_t currentPlayer = game->currentPlayer;
+ 317              		.loc 1 68 5 is_stmt 1 view .LVU72
+ 318              		.loc 1 68 14 is_stmt 0 view .LVU73
+ 319 0006 057A     		ldrb	r5, [r0, #8]	@ zero_extendqisi2
+ 320 0008 EDB2     		uxtb	r5, r5
+ 321              	.LVL18:
+  69:Src/game.c    **** 
+  70:Src/game.c    ****     switch (game->state)
+ 322              		.loc 1 70 5 is_stmt 1 view .LVU74
+ 323              		.loc 1 70 17 is_stmt 0 view .LVU75
+ 324 000a 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 325              		.loc 1 70 5 view .LVU76
+ 326 000c 002B     		cmp	r3, #0
+ 327 000e 47D0     		beq	.L17
+ 328 0010 03F0FF02 		and	r2, r3, #255
+ 329 0014 012A     		cmp	r2, #1
+ 330 0016 41D1     		bne	.L16
+ 331              	.LVL19:
+ 332              	.L18:
+  71:Src/game.c    ****     {
+  72:Src/game.c    ****         case NOT_STARTED:
+  73:Src/game.c    **** 
+  74:Src/game.c    ****             game->state = STARTED;
+  75:Src/game.c    ****             HAL_TIM_Base_Start_IT(&htim1);
+  76:Src/game.c    **** 
+  77:Src/game.c    ****         case STARTED:
+  78:Src/game.c    ****             
+  79:Src/game.c    ****             //1. Add bonus time to player
+  80:Src/game.c    ****             game->times[currentPlayer].seconds = game->times[currentPlayer].seconds + game->bonusSe
+ 333              		.loc 1 80 13 is_stmt 1 view .LVU77
+ 334              		.loc 1 80 76 is_stmt 0 view .LVU78
+ 335 0018 04EB4502 		add	r2, r4, r5, lsl #1
+ 336 001c 5179     		ldrb	r1, [r2, #5]	@ zero_extendqisi2
+ 337              		.loc 1 80 91 view .LVU79
+ 338 001e E378     		ldrb	r3, [r4, #3]	@ zero_extendqisi2
+ 339              		.loc 1 80 85 view .LVU80
+ 340 0020 0B44     		add	r3, r3, r1
+ 341 0022 DBB2     		uxtb	r3, r3
+ 342              		.loc 1 80 48 view .LVU81
+ 343 0024 5371     		strb	r3, [r2, #5]
+  81:Src/game.c    **** 
+  82:Src/game.c    ****             if (game->times[currentPlayer].seconds >= 60) {
+ 344              		.loc 1 82 13 is_stmt 1 view .LVU82
+ 345              		.loc 1 82 43 is_stmt 0 view .LVU83
+ 346 0026 5379     		ldrb	r3, [r2, #5]	@ zero_extendqisi2
+ 347 0028 DBB2     		uxtb	r3, r3
+ 348              		.loc 1 82 16 view .LVU84
+ 349 002a 3B2B     		cmp	r3, #59
+ 350 002c 07D9     		bls	.L20
+  83:Src/game.c    ****                 game->times[currentPlayer].seconds = game->times[currentPlayer].seconds - 60;
+ 351              		.loc 1 83 17 is_stmt 1 view .LVU85
+ 352              		.loc 1 83 80 is_stmt 0 view .LVU86
+ 353 002e 5379     		ldrb	r3, [r2, #5]	@ zero_extendqisi2
+ 354              		.loc 1 83 89 view .LVU87
+ 355 0030 3C3B     		subs	r3, r3, #60
+ 356 0032 DBB2     		uxtb	r3, r3
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s 			page 9
+
+
+ 357              		.loc 1 83 52 view .LVU88
+ 358 0034 5371     		strb	r3, [r2, #5]
+  84:Src/game.c    ****                 game->times[currentPlayer].minutes ++;
+ 359              		.loc 1 84 17 is_stmt 1 view .LVU89
+ 360              		.loc 1 84 43 is_stmt 0 view .LVU90
+ 361 0036 1379     		ldrb	r3, [r2, #4]	@ zero_extendqisi2
+ 362              		.loc 1 84 52 view .LVU91
+ 363 0038 0133     		adds	r3, r3, #1
+ 364 003a DBB2     		uxtb	r3, r3
+ 365 003c 1371     		strb	r3, [r2, #4]
+ 366              	.L20:
+  85:Src/game.c    ****             }
+  86:Src/game.c    **** 
+  87:Src/game.c    ****             if (game->times[currentPlayer].minutes >= game->startTime.minutes) {
+ 367              		.loc 1 87 13 is_stmt 1 view .LVU92
+ 368              		.loc 1 87 43 is_stmt 0 view .LVU93
+ 369 003e 04EB4503 		add	r3, r4, r5, lsl #1
+ 370 0042 1A79     		ldrb	r2, [r3, #4]	@ zero_extendqisi2
+ 371 0044 D2B2     		uxtb	r2, r2
+ 372              		.loc 1 87 70 view .LVU94
+ 373 0046 6378     		ldrb	r3, [r4, #1]	@ zero_extendqisi2
+ 374 0048 DBB2     		uxtb	r3, r3
+ 375              		.loc 1 87 16 view .LVU95
+ 376 004a 9A42     		cmp	r2, r3
+ 377 004c 0CD3     		bcc	.L21
+  88:Src/game.c    ****                 if (game->times[currentPlayer].seconds > game->startTime.seconds){
+ 378              		.loc 1 88 17 is_stmt 1 view .LVU96
+ 379              		.loc 1 88 47 is_stmt 0 view .LVU97
+ 380 004e 04EB4503 		add	r3, r4, r5, lsl #1
+ 381 0052 5A79     		ldrb	r2, [r3, #5]	@ zero_extendqisi2
+ 382 0054 D2B2     		uxtb	r2, r2
+ 383              		.loc 1 88 73 view .LVU98
+ 384 0056 A378     		ldrb	r3, [r4, #2]	@ zero_extendqisi2
+ 385 0058 DBB2     		uxtb	r3, r3
+ 386              		.loc 1 88 20 view .LVU99
+ 387 005a 9A42     		cmp	r2, r3
+ 388 005c 04D9     		bls	.L21
+  89:Src/game.c    ****                     game->times[currentPlayer].seconds = game->startTime.seconds;
+ 389              		.loc 1 89 21 is_stmt 1 view .LVU100
+ 390              		.loc 1 89 73 is_stmt 0 view .LVU101
+ 391 005e A378     		ldrb	r3, [r4, #2]	@ zero_extendqisi2
+ 392 0060 DBB2     		uxtb	r3, r3
+ 393              		.loc 1 89 56 view .LVU102
+ 394 0062 04EB4502 		add	r2, r4, r5, lsl #1
+ 395 0066 5371     		strb	r3, [r2, #5]
+ 396              	.L21:
+  90:Src/game.c    ****                 }
+  91:Src/game.c    ****             }
+  92:Src/game.c    **** 
+  93:Src/game.c    ****             //2. Set colon ON for unactive player
+  94:Src/game.c    ****             tm1637DisplayDecimal(display[currentPlayer], game->times[currentPlayer].minutes*100 + g
+ 397              		.loc 1 94 13 is_stmt 1 view .LVU103
+ 398              		.loc 1 94 84 is_stmt 0 view .LVU104
+ 399 0068 04EB4502 		add	r2, r4, r5, lsl #1
+ 400 006c 1179     		ldrb	r1, [r2, #4]	@ zero_extendqisi2
+ 401              		.loc 1 94 125 view .LVU105
+ 402 006e 5279     		ldrb	r2, [r2, #5]	@ zero_extendqisi2
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s 			page 10
+
+
+ 403              		.loc 1 94 13 view .LVU106
+ 404 0070 0E4B     		ldr	r3, .L23
+ 405 0072 03EB0515 		add	r5, r3, r5, lsl #4
+ 406              	.LVL20:
+ 407              		.loc 1 94 13 view .LVU107
+ 408 0076 0123     		movs	r3, #1
+ 409 0078 0193     		str	r3, [sp, #4]
+ 410 007a 6423     		movs	r3, #100
+ 411 007c 01FB0323 		mla	r3, r1, r3, r2
+ 412 0080 0093     		str	r3, [sp]
+ 413 0082 95E80F00 		ldm	r5, {r0, r1, r2, r3}
+ 414 0086 FFF7FEFF 		bl	tm1637DisplayDecimal
+ 415              	.LVL21:
+  95:Src/game.c    **** 
+  96:Src/game.c    ****             //3. Switch current player
+  97:Src/game.c    ****             game->currentPlayer = !game->currentPlayer;
+ 416              		.loc 1 97 13 is_stmt 1 view .LVU108
+ 417              		.loc 1 97 40 is_stmt 0 view .LVU109
+ 418 008a 237A     		ldrb	r3, [r4, #8]	@ zero_extendqisi2
+ 419              		.loc 1 97 35 view .LVU110
+ 420 008c B3FA83F3 		clz	r3, r3
+ 421 0090 5B09     		lsrs	r3, r3, #5
+ 422              		.loc 1 97 33 view .LVU111
+ 423 0092 2372     		strb	r3, [r4, #8]
+  98:Src/game.c    **** 
+  99:Src/game.c    ****             //4. Restart counter
+ 100:Src/game.c    ****             __HAL_TIM_SET_COUNTER(&htim1, 0);
+ 424              		.loc 1 100 13 is_stmt 1 view .LVU112
+ 425 0094 064B     		ldr	r3, .L23+4
+ 426 0096 1B68     		ldr	r3, [r3]
+ 427 0098 0022     		movs	r2, #0
+ 428 009a 5A62     		str	r2, [r3, #36]
+ 101:Src/game.c    ****             break;
+ 429              		.loc 1 101 13 view .LVU113
+ 430              	.L16:
+ 102:Src/game.c    **** 
+ 103:Src/game.c    ****         default:
+ 104:Src/game.c    ****             break;
+ 105:Src/game.c    ****     }
+ 106:Src/game.c    **** }
+ 431              		.loc 1 106 1 is_stmt 0 view .LVU114
+ 432 009c 03B0     		add	sp, sp, #12
+ 433              	.LCFI9:
+ 434              		.cfi_remember_state
+ 435              		.cfi_def_cfa_offset 12
+ 436              		@ sp needed
+ 437 009e 30BD     		pop	{r4, r5, pc}
+ 438              	.LVL22:
+ 439              	.L17:
+ 440              	.LCFI10:
+ 441              		.cfi_restore_state
+  74:Src/game.c    ****             HAL_TIM_Base_Start_IT(&htim1);
+ 442              		.loc 1 74 13 is_stmt 1 view .LVU115
+  74:Src/game.c    ****             HAL_TIM_Base_Start_IT(&htim1);
+ 443              		.loc 1 74 25 is_stmt 0 view .LVU116
+ 444 00a0 0123     		movs	r3, #1
+ 445 00a2 0370     		strb	r3, [r0]
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s 			page 11
+
+
+  75:Src/game.c    **** 
+ 446              		.loc 1 75 13 is_stmt 1 view .LVU117
+ 447 00a4 0248     		ldr	r0, .L23+4
+ 448              	.LVL23:
+  75:Src/game.c    **** 
+ 449              		.loc 1 75 13 is_stmt 0 view .LVU118
+ 450 00a6 FFF7FEFF 		bl	HAL_TIM_Base_Start_IT
+ 451              	.LVL24:
+ 452 00aa B5E7     		b	.L18
+ 453              	.L24:
+ 454              		.align	2
+ 455              	.L23:
+ 456 00ac 00000000 		.word	display
+ 457 00b0 00000000 		.word	htim1
+ 458              		.cfi_endproc
+ 459              	.LFE69:
+ 461              		.section	.text.switchGameState,"ax",%progbits
+ 462              		.align	1
+ 463              		.global	switchGameState
+ 464              		.syntax unified
+ 465              		.thumb
+ 466              		.thumb_func
+ 467              		.fpu softvfp
+ 469              	switchGameState:
+ 470              	.LVL25:
+ 471              	.LFB70:
+ 107:Src/game.c    **** 
+ 108:Src/game.c    **** void switchGameState (game_t *game) 
+ 109:Src/game.c    **** {
+ 472              		.loc 1 109 1 is_stmt 1 view -0
+ 473              		.cfi_startproc
+ 474              		@ args = 0, pretend = 0, frame = 0
+ 475              		@ frame_needed = 0, uses_anonymous_args = 0
+ 476              		.loc 1 109 1 is_stmt 0 view .LVU120
+ 477 0000 08B5     		push	{r3, lr}
+ 478              	.LCFI11:
+ 479              		.cfi_def_cfa_offset 8
+ 480              		.cfi_offset 3, -8
+ 481              		.cfi_offset 14, -4
+ 110:Src/game.c    ****     switch (game->state)
+ 482              		.loc 1 110 5 is_stmt 1 view .LVU121
+ 483              		.loc 1 110 17 is_stmt 0 view .LVU122
+ 484 0002 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 485 0004 DBB2     		uxtb	r3, r3
+ 486              		.loc 1 110 5 view .LVU123
+ 487 0006 012B     		cmp	r3, #1
+ 488 0008 02D0     		beq	.L26
+ 489 000a 022B     		cmp	r3, #2
+ 490 000c 06D0     		beq	.L27
+ 491              	.LVL26:
+ 492              	.L25:
+ 111:Src/game.c    ****     {
+ 112:Src/game.c    ****     case STARTED:
+ 113:Src/game.c    ****         game->state = PAUSED;
+ 114:Src/game.c    ****         HAL_TIM_Base_Stop_IT(&htim1);
+ 115:Src/game.c    ****         break;
+ 116:Src/game.c    **** 
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s 			page 12
+
+
+ 117:Src/game.c    ****     case PAUSED:
+ 118:Src/game.c    ****         game->state = STARTED;
+ 119:Src/game.c    ****         HAL_TIM_Base_Start_IT(&htim1);
+ 120:Src/game.c    ****         break;
+ 121:Src/game.c    ****     
+ 122:Src/game.c    ****     default:
+ 123:Src/game.c    ****         break;
+ 124:Src/game.c    ****     }
+ 125:Src/game.c    **** }
+ 493              		.loc 1 125 1 view .LVU124
+ 494 000e 08BD     		pop	{r3, pc}
+ 495              	.LVL27:
+ 496              	.L26:
+ 113:Src/game.c    ****         HAL_TIM_Base_Stop_IT(&htim1);
+ 497              		.loc 1 113 9 is_stmt 1 view .LVU125
+ 113:Src/game.c    ****         HAL_TIM_Base_Stop_IT(&htim1);
+ 498              		.loc 1 113 21 is_stmt 0 view .LVU126
+ 499 0010 0223     		movs	r3, #2
+ 500 0012 0370     		strb	r3, [r0]
+ 114:Src/game.c    ****         break;
+ 501              		.loc 1 114 9 is_stmt 1 view .LVU127
+ 502 0014 0448     		ldr	r0, .L30
+ 503              	.LVL28:
+ 114:Src/game.c    ****         break;
+ 504              		.loc 1 114 9 is_stmt 0 view .LVU128
+ 505 0016 FFF7FEFF 		bl	HAL_TIM_Base_Stop_IT
+ 506              	.LVL29:
+ 115:Src/game.c    **** 
+ 507              		.loc 1 115 9 is_stmt 1 view .LVU129
+ 508 001a F8E7     		b	.L25
+ 509              	.LVL30:
+ 510              	.L27:
+ 118:Src/game.c    ****         HAL_TIM_Base_Start_IT(&htim1);
+ 511              		.loc 1 118 9 view .LVU130
+ 118:Src/game.c    ****         HAL_TIM_Base_Start_IT(&htim1);
+ 512              		.loc 1 118 21 is_stmt 0 view .LVU131
+ 513 001c 0123     		movs	r3, #1
+ 514 001e 0370     		strb	r3, [r0]
+ 119:Src/game.c    ****         break;
+ 515              		.loc 1 119 9 is_stmt 1 view .LVU132
+ 516 0020 0148     		ldr	r0, .L30
+ 517              	.LVL31:
+ 119:Src/game.c    ****         break;
+ 518              		.loc 1 119 9 is_stmt 0 view .LVU133
+ 519 0022 FFF7FEFF 		bl	HAL_TIM_Base_Start_IT
+ 520              	.LVL32:
+ 120:Src/game.c    ****     
+ 521              		.loc 1 120 9 is_stmt 1 view .LVU134
+ 522              		.loc 1 125 1 is_stmt 0 view .LVU135
+ 523 0026 F2E7     		b	.L25
+ 524              	.L31:
+ 525              		.align	2
+ 526              	.L30:
+ 527 0028 00000000 		.word	htim1
+ 528              		.cfi_endproc
+ 529              	.LFE70:
+ 531              		.comm	mode,1,1
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s 			page 13
+
+
+ 532              		.comm	display,32,4
+ 533              		.comm	game,9,4
+ 534              		.text
+ 535              	.Letext0:
+ 536              		.file 2 "g:\\program files (x86)\\gnu tools arm embedded\\9 2019-q4-major\\arm-none-eabi\\include\
+ 537              		.file 3 "g:\\program files (x86)\\gnu tools arm embedded\\9 2019-q4-major\\arm-none-eabi\\include\
+ 538              		.file 4 "Inc/game.h"
+ 539              		.file 5 "Drivers/CMSIS/Include/core_cm3.h"
+ 540              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
+ 541              		.file 7 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 542              		.file 8 "g:\\program files (x86)\\gnu tools arm embedded\\9 2019-q4-major\\arm-none-eabi\\include\
+ 543              		.file 9 "g:\\program files (x86)\\gnu tools arm embedded\\9 2019-q4-major\\arm-none-eabi\\include\
+ 544              		.file 10 "g:\\program files (x86)\\gnu tools arm embedded\\9 2019-q4-major\\lib\\gcc\\arm-none-eab
+ 545              		.file 11 "g:\\program files (x86)\\gnu tools arm embedded\\9 2019-q4-major\\arm-none-eabi\\include
+ 546              		.file 12 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
+ 547              		.file 13 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
+ 548              		.file 14 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h"
+ 549              		.file 15 "Inc/tim.h"
+ 550              		.file 16 "Inc/stm32_tm1637.h"
+ 551              		.file 17 "Inc/mode.h"
+ 552              		.file 18 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s 			page 14
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 game.c
+C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s:16     .text.setTimeForBothPlayers:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s:24     .text.setTimeForBothPlayers:00000000 setTimeForBothPlayers
+C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s:63     .text.gameInit:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s:70     .text.gameInit:00000000 gameInit
+C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s:152    .text.gameInit:00000058 $d
+                            *COM*:00000001 mode
+                            *COM*:00000020 display
+C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s:159    .text.decrementTimeForActivePlayer:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s:166    .text.decrementTimeForActivePlayer:00000000 decrementTimeForActivePlayer
+C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s:286    .text.decrementTimeForActivePlayer:0000007c $d
+C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s:292    .text.switchCurrentPlayer:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s:299    .text.switchCurrentPlayer:00000000 switchCurrentPlayer
+C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s:456    .text.switchCurrentPlayer:000000ac $d
+C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s:462    .text.switchGameState:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s:469    .text.switchGameState:00000000 switchGameState
+C:\Users\Marcin\AppData\Local\Temp\cc9GtyGf.s:527    .text.switchGameState:00000028 $d
+                            *COM*:00000009 game
+
+UNDEFINED SYMBOLS
+HAL_GPIO_ReadPin
+tm1637DisplayDecimal
+HAL_TIM_Base_Stop_IT
+htim1
+HAL_TIM_Base_Start_IT

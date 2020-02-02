@@ -1,0 +1,1675 @@
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"stm32_tm1637.c"
+  12              		.text
+  13              	.Ltext0:
+  14              		.cfi_sections	.debug_frame
+  15              		.section	.text._tm1637DelayUsec,"ax",%progbits
+  16              		.align	1
+  17              		.global	_tm1637DelayUsec
+  18              		.arch armv7-m
+  19              		.syntax unified
+  20              		.thumb
+  21              		.thumb_func
+  22              		.fpu softvfp
+  24              	_tm1637DelayUsec:
+  25              	.LVL0:
+  26              	.LFB75:
+  27              		.file 1 "Src/stm32_tm1637.c"
+   1:Src/stm32_tm1637.c **** #include "stm32f1xx_hal.h"
+   2:Src/stm32_tm1637.c **** #include "stm32_tm1637.h"
+   3:Src/stm32_tm1637.c **** 
+   4:Src/stm32_tm1637.c **** 
+   5:Src/stm32_tm1637.c **** // Configuration.
+   6:Src/stm32_tm1637.c **** 
+   7:Src/stm32_tm1637.c **** #define DIS1_CLK_PORT               GPIOB
+   8:Src/stm32_tm1637.c **** #define DIS1_DIO_PORT               GPIOB
+   9:Src/stm32_tm1637.c **** #define DIS1_CLK_PIN                GPIO_PIN_10
+  10:Src/stm32_tm1637.c **** #define DIS1_DIO_PIN                GPIO_PIN_11
+  11:Src/stm32_tm1637.c **** 
+  12:Src/stm32_tm1637.c **** #define DIS2_CLK_PORT               GPIOB
+  13:Src/stm32_tm1637.c **** #define DIS2_DIO_PORT               GPIOB
+  14:Src/stm32_tm1637.c **** #define DIS2_CLK_PIN                GPIO_PIN_8
+  15:Src/stm32_tm1637.c **** #define DIS2_DIO_PIN                GPIO_PIN_9
+  16:Src/stm32_tm1637.c **** 
+  17:Src/stm32_tm1637.c **** #define CLK_PORT_CLK_ENABLE         __HAL_RCC_GPIOB_CLK_ENABLE
+  18:Src/stm32_tm1637.c **** #define DIO_PORT_CLK_ENABLE         __HAL_RCC_GPIOB_CLK_ENABLE
+  19:Src/stm32_tm1637.c **** 
+  20:Src/stm32_tm1637.c **** void _tm1637Start(display_t display);
+  21:Src/stm32_tm1637.c **** void _tm1637Stop(display_t display);
+  22:Src/stm32_tm1637.c **** void _tm1637ReadResult(display_t display);
+  23:Src/stm32_tm1637.c **** void _tm1637WriteByte(display_t display, unsigned char b);
+  24:Src/stm32_tm1637.c **** void _tm1637DelayUsec(unsigned int i);
+  25:Src/stm32_tm1637.c **** void _tm1637ClkHigh(display_t display);
+  26:Src/stm32_tm1637.c **** void _tm1637ClkLow(display_t display);
+  27:Src/stm32_tm1637.c **** void _tm1637DioHigh(display_t display);
+  28:Src/stm32_tm1637.c **** void _tm1637DioLow(display_t display);
+  29:Src/stm32_tm1637.c **** 
+  30:Src/stm32_tm1637.c **** display_t display[2] = { 
+  31:Src/stm32_tm1637.c ****     {DIS1_DIO_PORT, DIS1_DIO_PIN, DIS1_CLK_PORT, DIS1_CLK_PIN},
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 2
+
+
+  32:Src/stm32_tm1637.c ****     {DIS2_DIO_PORT, DIS2_DIO_PIN, DIS2_CLK_PORT, DIS2_CLK_PIN}
+  33:Src/stm32_tm1637.c **** };
+  34:Src/stm32_tm1637.c **** 
+  35:Src/stm32_tm1637.c **** const char wordSegmentMap[5][4] = {
+  36:Src/stm32_tm1637.c ****     {0x6d, 0x78, 0x77, 0x50}, //star
+  37:Src/stm32_tm1637.c ****     {0x78, 0x10, 0x54, 0x44}, //tim
+  38:Src/stm32_tm1637.c ****     {0x7c, 0x5c, 0x54, 0x1c}, //bonu
+  39:Src/stm32_tm1637.c ****     {0x7c, 0x50, 0x10, 0x6f},  //brig
+  40:Src/stm32_tm1637.c ****     {0x00, 0x00, 0x00, 0x00}  //clear
+  41:Src/stm32_tm1637.c **** };
+  42:Src/stm32_tm1637.c **** 
+  43:Src/stm32_tm1637.c **** const char segmentMap[] = {
+  44:Src/stm32_tm1637.c ****     0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, // 0-7
+  45:Src/stm32_tm1637.c ****     0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, // 8-9, A-F
+  46:Src/stm32_tm1637.c ****     0x00
+  47:Src/stm32_tm1637.c **** };
+  48:Src/stm32_tm1637.c **** 
+  49:Src/stm32_tm1637.c **** 
+  50:Src/stm32_tm1637.c **** void tm1637Init(display_t display)
+  51:Src/stm32_tm1637.c **** {
+  52:Src/stm32_tm1637.c ****     CLK_PORT_CLK_ENABLE();
+  53:Src/stm32_tm1637.c ****     DIO_PORT_CLK_ENABLE();
+  54:Src/stm32_tm1637.c ****     GPIO_InitTypeDef g = {0};
+  55:Src/stm32_tm1637.c ****     g.Pull = GPIO_PULLUP;
+  56:Src/stm32_tm1637.c ****     g.Mode = GPIO_MODE_OUTPUT_OD; // OD = open drain
+  57:Src/stm32_tm1637.c ****     g.Speed = GPIO_SPEED_FREQ_HIGH;
+  58:Src/stm32_tm1637.c ****     g.Pin = display.clkPin;
+  59:Src/stm32_tm1637.c ****     HAL_GPIO_Init(display.clkPort, &g);
+  60:Src/stm32_tm1637.c ****     g.Pin = display.dioPin;
+  61:Src/stm32_tm1637.c ****     HAL_GPIO_Init(display.dioPort, &g);
+  62:Src/stm32_tm1637.c ****     tm1637SetBrightness(display, 8);
+  63:Src/stm32_tm1637.c **** }
+  64:Src/stm32_tm1637.c **** 
+  65:Src/stm32_tm1637.c **** void tm1637DisplayDecimal(display_t display, int v, int displaySeparator)
+  66:Src/stm32_tm1637.c **** {
+  67:Src/stm32_tm1637.c ****     unsigned char digitArr[4];
+  68:Src/stm32_tm1637.c ****     for (int i = 0; i < 4; ++i) {
+  69:Src/stm32_tm1637.c ****         digitArr[i] = segmentMap[v % 10];
+  70:Src/stm32_tm1637.c ****         if (i == 2 && displaySeparator) {
+  71:Src/stm32_tm1637.c ****             digitArr[i] |= 1 << 7;
+  72:Src/stm32_tm1637.c ****         }
+  73:Src/stm32_tm1637.c ****         v /= 10;
+  74:Src/stm32_tm1637.c ****     }
+  75:Src/stm32_tm1637.c **** 
+  76:Src/stm32_tm1637.c ****     _tm1637Start(display);
+  77:Src/stm32_tm1637.c ****     _tm1637WriteByte(display, 0x40);
+  78:Src/stm32_tm1637.c ****     _tm1637ReadResult(display);
+  79:Src/stm32_tm1637.c ****     _tm1637Stop(display);
+  80:Src/stm32_tm1637.c **** 
+  81:Src/stm32_tm1637.c ****     _tm1637Start(display);
+  82:Src/stm32_tm1637.c ****     _tm1637WriteByte(display, 0xc0);
+  83:Src/stm32_tm1637.c ****     _tm1637ReadResult(display);
+  84:Src/stm32_tm1637.c **** 
+  85:Src/stm32_tm1637.c ****     for (int i = 0; i < 4; ++i) {
+  86:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[3 - i]);
+  87:Src/stm32_tm1637.c ****         _tm1637ReadResult(display);
+  88:Src/stm32_tm1637.c ****     }
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 3
+
+
+  89:Src/stm32_tm1637.c **** 
+  90:Src/stm32_tm1637.c ****     _tm1637Stop(display);
+  91:Src/stm32_tm1637.c **** }
+  92:Src/stm32_tm1637.c **** 
+  93:Src/stm32_tm1637.c **** void tm1637DisplayText(display_t display, uint8_t type)
+  94:Src/stm32_tm1637.c **** {
+  95:Src/stm32_tm1637.c ****     unsigned char digitArr[4];
+  96:Src/stm32_tm1637.c ****     for (int i = 0; i < 4; ++i) {
+  97:Src/stm32_tm1637.c ****         digitArr[i] = wordSegmentMap[type][i];
+  98:Src/stm32_tm1637.c ****     }
+  99:Src/stm32_tm1637.c **** 
+ 100:Src/stm32_tm1637.c ****     _tm1637Start(display);
+ 101:Src/stm32_tm1637.c ****     _tm1637WriteByte(display, 0x40);
+ 102:Src/stm32_tm1637.c ****     _tm1637ReadResult(display);
+ 103:Src/stm32_tm1637.c ****     _tm1637Stop(display);
+ 104:Src/stm32_tm1637.c **** 
+ 105:Src/stm32_tm1637.c ****     _tm1637Start(display);
+ 106:Src/stm32_tm1637.c ****     _tm1637WriteByte(display, 0xc0);
+ 107:Src/stm32_tm1637.c ****     _tm1637ReadResult(display);
+ 108:Src/stm32_tm1637.c **** 
+ 109:Src/stm32_tm1637.c ****     for (int i = 0; i < 4; ++i) {
+ 110:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[i]);
+ 111:Src/stm32_tm1637.c ****         _tm1637ReadResult(display);
+ 112:Src/stm32_tm1637.c ****     }
+ 113:Src/stm32_tm1637.c **** 
+ 114:Src/stm32_tm1637.c ****     _tm1637Stop(display);
+ 115:Src/stm32_tm1637.c **** }
+ 116:Src/stm32_tm1637.c **** 
+ 117:Src/stm32_tm1637.c **** void tm1637DisplayClear(display_t display)
+ 118:Src/stm32_tm1637.c **** {
+ 119:Src/stm32_tm1637.c ****     unsigned char digitArr[4];
+ 120:Src/stm32_tm1637.c ****     for (int i = 0; i < 4; ++i) {
+ 121:Src/stm32_tm1637.c ****         digitArr[i] = 0;
+ 122:Src/stm32_tm1637.c ****     }
+ 123:Src/stm32_tm1637.c **** 
+ 124:Src/stm32_tm1637.c ****     _tm1637Start(display);
+ 125:Src/stm32_tm1637.c ****     _tm1637WriteByte(display, 0x40);
+ 126:Src/stm32_tm1637.c ****     _tm1637ReadResult(display);
+ 127:Src/stm32_tm1637.c ****     _tm1637Stop(display);
+ 128:Src/stm32_tm1637.c **** 
+ 129:Src/stm32_tm1637.c ****     _tm1637Start(display);
+ 130:Src/stm32_tm1637.c ****     _tm1637WriteByte(display, 0xc0);
+ 131:Src/stm32_tm1637.c ****     _tm1637ReadResult(display);
+ 132:Src/stm32_tm1637.c **** 
+ 133:Src/stm32_tm1637.c ****     for (int i = 0; i < 4; ++i) {
+ 134:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[i]);
+ 135:Src/stm32_tm1637.c ****         _tm1637ReadResult(display);
+ 136:Src/stm32_tm1637.c ****     }
+ 137:Src/stm32_tm1637.c **** 
+ 138:Src/stm32_tm1637.c ****     _tm1637Stop(display);
+ 139:Src/stm32_tm1637.c **** }
+ 140:Src/stm32_tm1637.c **** 
+ 141:Src/stm32_tm1637.c **** // Valid brightness values: 0 - 8.
+ 142:Src/stm32_tm1637.c **** // 0 = display off.
+ 143:Src/stm32_tm1637.c **** void tm1637SetBrightness(display_t display, char brightness)
+ 144:Src/stm32_tm1637.c **** {
+ 145:Src/stm32_tm1637.c ****     // Brightness command:
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 4
+
+
+ 146:Src/stm32_tm1637.c ****     // 1000 0XXX = display off
+ 147:Src/stm32_tm1637.c ****     // 1000 1BBB = display on, brightness 0-7
+ 148:Src/stm32_tm1637.c ****     // X = don't care
+ 149:Src/stm32_tm1637.c ****     // B = brightness
+ 150:Src/stm32_tm1637.c ****     _tm1637Start(display);
+ 151:Src/stm32_tm1637.c ****     _tm1637WriteByte(display, 0x87 + brightness);
+ 152:Src/stm32_tm1637.c ****     _tm1637ReadResult(display);
+ 153:Src/stm32_tm1637.c ****     _tm1637Stop(display);
+ 154:Src/stm32_tm1637.c **** }
+ 155:Src/stm32_tm1637.c **** 
+ 156:Src/stm32_tm1637.c **** void _tm1637Start(display_t display)
+ 157:Src/stm32_tm1637.c **** {
+ 158:Src/stm32_tm1637.c ****     _tm1637ClkHigh(display);
+ 159:Src/stm32_tm1637.c ****     _tm1637DioHigh(display);
+ 160:Src/stm32_tm1637.c ****     _tm1637DelayUsec(2);
+ 161:Src/stm32_tm1637.c ****     _tm1637DioLow(display);
+ 162:Src/stm32_tm1637.c **** }
+ 163:Src/stm32_tm1637.c **** 
+ 164:Src/stm32_tm1637.c **** void _tm1637Stop(display_t display)
+ 165:Src/stm32_tm1637.c **** {
+ 166:Src/stm32_tm1637.c ****     _tm1637ClkLow(display);
+ 167:Src/stm32_tm1637.c ****     _tm1637DelayUsec(2);
+ 168:Src/stm32_tm1637.c ****     _tm1637DioLow(display);
+ 169:Src/stm32_tm1637.c ****     _tm1637DelayUsec(2);
+ 170:Src/stm32_tm1637.c ****     _tm1637ClkHigh(display);
+ 171:Src/stm32_tm1637.c ****     _tm1637DelayUsec(2);
+ 172:Src/stm32_tm1637.c ****     _tm1637DioHigh(display);
+ 173:Src/stm32_tm1637.c **** }
+ 174:Src/stm32_tm1637.c **** 
+ 175:Src/stm32_tm1637.c **** void _tm1637ReadResult(display_t display)
+ 176:Src/stm32_tm1637.c **** {
+ 177:Src/stm32_tm1637.c ****     _tm1637ClkLow(display);
+ 178:Src/stm32_tm1637.c ****     _tm1637DelayUsec(5);
+ 179:Src/stm32_tm1637.c ****     // while (dio); // We're cheating here and not actually reading back the response.
+ 180:Src/stm32_tm1637.c ****     _tm1637ClkHigh(display);
+ 181:Src/stm32_tm1637.c ****     _tm1637DelayUsec(2);
+ 182:Src/stm32_tm1637.c ****     _tm1637ClkLow(display);
+ 183:Src/stm32_tm1637.c **** }
+ 184:Src/stm32_tm1637.c **** 
+ 185:Src/stm32_tm1637.c **** void _tm1637WriteByte(display_t display, unsigned char b)
+ 186:Src/stm32_tm1637.c **** {
+ 187:Src/stm32_tm1637.c ****     for (int i = 0; i < 8; ++i) {
+ 188:Src/stm32_tm1637.c ****         _tm1637ClkLow(display);
+ 189:Src/stm32_tm1637.c ****         if (b & 0x01) {
+ 190:Src/stm32_tm1637.c ****             _tm1637DioHigh(display);
+ 191:Src/stm32_tm1637.c ****         }
+ 192:Src/stm32_tm1637.c ****         else {
+ 193:Src/stm32_tm1637.c ****             _tm1637DioLow(display);
+ 194:Src/stm32_tm1637.c ****         }
+ 195:Src/stm32_tm1637.c ****         _tm1637DelayUsec(3);
+ 196:Src/stm32_tm1637.c ****         b >>= 1;
+ 197:Src/stm32_tm1637.c ****         _tm1637ClkHigh(display);
+ 198:Src/stm32_tm1637.c ****         _tm1637DelayUsec(3);
+ 199:Src/stm32_tm1637.c ****     }
+ 200:Src/stm32_tm1637.c **** }
+ 201:Src/stm32_tm1637.c **** 
+ 202:Src/stm32_tm1637.c **** void _tm1637DelayUsec(unsigned int i)
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 5
+
+
+ 203:Src/stm32_tm1637.c **** {
+  28              		.loc 1 203 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+ 204:Src/stm32_tm1637.c ****     for (; i>0; i--) {
+  33              		.loc 1 204 5 view .LVU1
+  34 0000 00E0     		b	.L2
+  35              	.LVL1:
+  36              	.L7:
+  37              		.loc 1 204 17 view .LVU2
+  38              		.loc 1 204 18 is_stmt 0 view .LVU3
+  39 0002 0138     		subs	r0, r0, #1
+  40              	.LVL2:
+  41              	.L2:
+  42              		.loc 1 204 12 is_stmt 1 discriminator 1 view .LVU4
+  43              		.loc 1 204 5 is_stmt 0 discriminator 1 view .LVU5
+  44 0004 28B1     		cbz	r0, .L6
+  45              	.LBB2:
+ 205:Src/stm32_tm1637.c ****         for (int j = 0; j < 10; ++j) {
+  46              		.loc 1 205 18 view .LVU6
+  47 0006 0023     		movs	r3, #0
+  48              	.L4:
+  49              	.LVL3:
+  50              		.loc 1 205 25 is_stmt 1 discriminator 1 view .LVU7
+  51              		.loc 1 205 9 is_stmt 0 discriminator 1 view .LVU8
+  52 0008 092B     		cmp	r3, #9
+  53 000a FADC     		bgt	.L7
+ 206:Src/stm32_tm1637.c ****             __asm__ __volatile__("nop\n\t":::"memory");
+  54              		.loc 1 206 13 is_stmt 1 discriminator 3 view .LVU9
+  55              		.syntax unified
+  56              	@ 206 "Src/stm32_tm1637.c" 1
+  57 000c 00BF     		nop
+  58              		
+  59              	@ 0 "" 2
+ 205:Src/stm32_tm1637.c ****         for (int j = 0; j < 10; ++j) {
+  60              		.loc 1 205 33 discriminator 3 view .LVU10
+  61              		.thumb
+  62              		.syntax unified
+  63 000e 0133     		adds	r3, r3, #1
+  64              	.LVL4:
+ 205:Src/stm32_tm1637.c ****         for (int j = 0; j < 10; ++j) {
+  65              		.loc 1 205 33 is_stmt 0 discriminator 3 view .LVU11
+  66 0010 FAE7     		b	.L4
+  67              	.LVL5:
+  68              	.L6:
+ 205:Src/stm32_tm1637.c ****         for (int j = 0; j < 10; ++j) {
+  69              		.loc 1 205 33 discriminator 3 view .LVU12
+  70              	.LBE2:
+ 207:Src/stm32_tm1637.c ****         }
+ 208:Src/stm32_tm1637.c ****     }
+ 209:Src/stm32_tm1637.c **** }
+  71              		.loc 1 209 1 view .LVU13
+  72 0012 7047     		bx	lr
+  73              		.cfi_endproc
+  74              	.LFE75:
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 6
+
+
+  76              		.section	.text._tm1637ClkHigh,"ax",%progbits
+  77              		.align	1
+  78              		.global	_tm1637ClkHigh
+  79              		.syntax unified
+  80              		.thumb
+  81              		.thumb_func
+  82              		.fpu softvfp
+  84              	_tm1637ClkHigh:
+  85              	.LFB76:
+ 210:Src/stm32_tm1637.c **** 
+ 211:Src/stm32_tm1637.c **** void _tm1637ClkHigh(display_t display)
+ 212:Src/stm32_tm1637.c **** {
+  86              		.loc 1 212 1 is_stmt 1 view -0
+  87              		.cfi_startproc
+  88              		@ args = 0, pretend = 0, frame = 16
+  89              		@ frame_needed = 0, uses_anonymous_args = 0
+  90 0000 00B5     		push	{lr}
+  91              	.LCFI0:
+  92              		.cfi_def_cfa_offset 4
+  93              		.cfi_offset 14, -4
+  94 0002 85B0     		sub	sp, sp, #20
+  95              	.LCFI1:
+  96              		.cfi_def_cfa_offset 24
+  97 0004 0DF1100C 		add	ip, sp, #16
+  98 0008 0CE90F00 		stmdb	ip, {r0, r1, r2, r3}
+ 213:Src/stm32_tm1637.c ****     HAL_GPIO_WritePin(display.clkPort, display.clkPin, GPIO_PIN_SET);
+  99              		.loc 1 213 5 view .LVU15
+ 100 000c 0122     		movs	r2, #1
+ 101 000e BDF80C10 		ldrh	r1, [sp, #12]
+ 102 0012 0298     		ldr	r0, [sp, #8]
+ 103 0014 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 104              	.LVL6:
+ 214:Src/stm32_tm1637.c **** }
+ 105              		.loc 1 214 1 is_stmt 0 view .LVU16
+ 106 0018 05B0     		add	sp, sp, #20
+ 107              	.LCFI2:
+ 108              		.cfi_def_cfa_offset 4
+ 109              		@ sp needed
+ 110 001a 5DF804FB 		ldr	pc, [sp], #4
+ 111              		.cfi_endproc
+ 112              	.LFE76:
+ 114              		.section	.text._tm1637ClkLow,"ax",%progbits
+ 115              		.align	1
+ 116              		.global	_tm1637ClkLow
+ 117              		.syntax unified
+ 118              		.thumb
+ 119              		.thumb_func
+ 120              		.fpu softvfp
+ 122              	_tm1637ClkLow:
+ 123              	.LFB77:
+ 215:Src/stm32_tm1637.c **** 
+ 216:Src/stm32_tm1637.c **** void _tm1637ClkLow(display_t display)
+ 217:Src/stm32_tm1637.c **** {
+ 124              		.loc 1 217 1 is_stmt 1 view -0
+ 125              		.cfi_startproc
+ 126              		@ args = 0, pretend = 0, frame = 16
+ 127              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 7
+
+
+ 128 0000 00B5     		push	{lr}
+ 129              	.LCFI3:
+ 130              		.cfi_def_cfa_offset 4
+ 131              		.cfi_offset 14, -4
+ 132 0002 85B0     		sub	sp, sp, #20
+ 133              	.LCFI4:
+ 134              		.cfi_def_cfa_offset 24
+ 135 0004 0DF1100C 		add	ip, sp, #16
+ 136 0008 0CE90F00 		stmdb	ip, {r0, r1, r2, r3}
+ 218:Src/stm32_tm1637.c ****     HAL_GPIO_WritePin(display.clkPort, display.clkPin, GPIO_PIN_RESET);
+ 137              		.loc 1 218 5 view .LVU18
+ 138 000c 0022     		movs	r2, #0
+ 139 000e BDF80C10 		ldrh	r1, [sp, #12]
+ 140 0012 0298     		ldr	r0, [sp, #8]
+ 141 0014 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 142              	.LVL7:
+ 219:Src/stm32_tm1637.c **** }
+ 143              		.loc 1 219 1 is_stmt 0 view .LVU19
+ 144 0018 05B0     		add	sp, sp, #20
+ 145              	.LCFI5:
+ 146              		.cfi_def_cfa_offset 4
+ 147              		@ sp needed
+ 148 001a 5DF804FB 		ldr	pc, [sp], #4
+ 149              		.cfi_endproc
+ 150              	.LFE77:
+ 152              		.section	.text._tm1637ReadResult,"ax",%progbits
+ 153              		.align	1
+ 154              		.global	_tm1637ReadResult
+ 155              		.syntax unified
+ 156              		.thumb
+ 157              		.thumb_func
+ 158              		.fpu softvfp
+ 160              	_tm1637ReadResult:
+ 161              	.LFB73:
+ 176:Src/stm32_tm1637.c ****     _tm1637ClkLow(display);
+ 162              		.loc 1 176 1 is_stmt 1 view -0
+ 163              		.cfi_startproc
+ 164              		@ args = 0, pretend = 0, frame = 16
+ 165              		@ frame_needed = 0, uses_anonymous_args = 0
+ 166 0000 10B5     		push	{r4, lr}
+ 167              	.LCFI6:
+ 168              		.cfi_def_cfa_offset 8
+ 169              		.cfi_offset 4, -8
+ 170              		.cfi_offset 14, -4
+ 171 0002 84B0     		sub	sp, sp, #16
+ 172              	.LCFI7:
+ 173              		.cfi_def_cfa_offset 24
+ 174 0004 6C46     		mov	r4, sp
+ 175 0006 84E80F00 		stm	r4, {r0, r1, r2, r3}
+ 177:Src/stm32_tm1637.c ****     _tm1637DelayUsec(5);
+ 176              		.loc 1 177 5 view .LVU21
+ 177 000a 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 178 000e FFF7FEFF 		bl	_tm1637ClkLow
+ 179              	.LVL8:
+ 178:Src/stm32_tm1637.c ****     // while (dio); // We're cheating here and not actually reading back the response.
+ 180              		.loc 1 178 5 view .LVU22
+ 181 0012 0520     		movs	r0, #5
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 8
+
+
+ 182 0014 FFF7FEFF 		bl	_tm1637DelayUsec
+ 183              	.LVL9:
+ 180:Src/stm32_tm1637.c ****     _tm1637DelayUsec(2);
+ 184              		.loc 1 180 5 view .LVU23
+ 185 0018 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 186 001c FFF7FEFF 		bl	_tm1637ClkHigh
+ 187              	.LVL10:
+ 181:Src/stm32_tm1637.c ****     _tm1637ClkLow(display);
+ 188              		.loc 1 181 5 view .LVU24
+ 189 0020 0220     		movs	r0, #2
+ 190 0022 FFF7FEFF 		bl	_tm1637DelayUsec
+ 191              	.LVL11:
+ 182:Src/stm32_tm1637.c **** }
+ 192              		.loc 1 182 5 view .LVU25
+ 193 0026 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 194 002a FFF7FEFF 		bl	_tm1637ClkLow
+ 195              	.LVL12:
+ 183:Src/stm32_tm1637.c **** 
+ 196              		.loc 1 183 1 is_stmt 0 view .LVU26
+ 197 002e 04B0     		add	sp, sp, #16
+ 198              	.LCFI8:
+ 199              		.cfi_def_cfa_offset 8
+ 200              		@ sp needed
+ 201 0030 10BD     		pop	{r4, pc}
+ 202              		.cfi_endproc
+ 203              	.LFE73:
+ 205              		.section	.text._tm1637DioHigh,"ax",%progbits
+ 206              		.align	1
+ 207              		.global	_tm1637DioHigh
+ 208              		.syntax unified
+ 209              		.thumb
+ 210              		.thumb_func
+ 211              		.fpu softvfp
+ 213              	_tm1637DioHigh:
+ 214              	.LFB78:
+ 220:Src/stm32_tm1637.c **** 
+ 221:Src/stm32_tm1637.c **** void _tm1637DioHigh(display_t display)
+ 222:Src/stm32_tm1637.c **** {
+ 215              		.loc 1 222 1 is_stmt 1 view -0
+ 216              		.cfi_startproc
+ 217              		@ args = 0, pretend = 0, frame = 16
+ 218              		@ frame_needed = 0, uses_anonymous_args = 0
+ 219 0000 00B5     		push	{lr}
+ 220              	.LCFI9:
+ 221              		.cfi_def_cfa_offset 4
+ 222              		.cfi_offset 14, -4
+ 223 0002 85B0     		sub	sp, sp, #20
+ 224              	.LCFI10:
+ 225              		.cfi_def_cfa_offset 24
+ 226 0004 0DF1100C 		add	ip, sp, #16
+ 227 0008 0CE90F00 		stmdb	ip, {r0, r1, r2, r3}
+ 223:Src/stm32_tm1637.c ****     HAL_GPIO_WritePin(display.dioPort, display.dioPin, GPIO_PIN_SET);
+ 228              		.loc 1 223 5 view .LVU28
+ 229 000c 0122     		movs	r2, #1
+ 230 000e BDF80410 		ldrh	r1, [sp, #4]
+ 231 0012 0098     		ldr	r0, [sp]
+ 232 0014 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 9
+
+
+ 233              	.LVL13:
+ 224:Src/stm32_tm1637.c **** }
+ 234              		.loc 1 224 1 is_stmt 0 view .LVU29
+ 235 0018 05B0     		add	sp, sp, #20
+ 236              	.LCFI11:
+ 237              		.cfi_def_cfa_offset 4
+ 238              		@ sp needed
+ 239 001a 5DF804FB 		ldr	pc, [sp], #4
+ 240              		.cfi_endproc
+ 241              	.LFE78:
+ 243              		.section	.text._tm1637DioLow,"ax",%progbits
+ 244              		.align	1
+ 245              		.global	_tm1637DioLow
+ 246              		.syntax unified
+ 247              		.thumb
+ 248              		.thumb_func
+ 249              		.fpu softvfp
+ 251              	_tm1637DioLow:
+ 252              	.LFB79:
+ 225:Src/stm32_tm1637.c **** 
+ 226:Src/stm32_tm1637.c **** void _tm1637DioLow(display_t display)
+ 227:Src/stm32_tm1637.c **** {
+ 253              		.loc 1 227 1 is_stmt 1 view -0
+ 254              		.cfi_startproc
+ 255              		@ args = 0, pretend = 0, frame = 16
+ 256              		@ frame_needed = 0, uses_anonymous_args = 0
+ 257 0000 00B5     		push	{lr}
+ 258              	.LCFI12:
+ 259              		.cfi_def_cfa_offset 4
+ 260              		.cfi_offset 14, -4
+ 261 0002 85B0     		sub	sp, sp, #20
+ 262              	.LCFI13:
+ 263              		.cfi_def_cfa_offset 24
+ 264 0004 0DF1100C 		add	ip, sp, #16
+ 265 0008 0CE90F00 		stmdb	ip, {r0, r1, r2, r3}
+ 228:Src/stm32_tm1637.c ****     HAL_GPIO_WritePin(display.dioPort, display.dioPin, GPIO_PIN_RESET);
+ 266              		.loc 1 228 5 view .LVU31
+ 267 000c 0022     		movs	r2, #0
+ 268 000e BDF80410 		ldrh	r1, [sp, #4]
+ 269 0012 0098     		ldr	r0, [sp]
+ 270 0014 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 271              	.LVL14:
+ 229:Src/stm32_tm1637.c **** }
+ 272              		.loc 1 229 1 is_stmt 0 view .LVU32
+ 273 0018 05B0     		add	sp, sp, #20
+ 274              	.LCFI14:
+ 275              		.cfi_def_cfa_offset 4
+ 276              		@ sp needed
+ 277 001a 5DF804FB 		ldr	pc, [sp], #4
+ 278              		.cfi_endproc
+ 279              	.LFE79:
+ 281              		.section	.text._tm1637Start,"ax",%progbits
+ 282              		.align	1
+ 283              		.global	_tm1637Start
+ 284              		.syntax unified
+ 285              		.thumb
+ 286              		.thumb_func
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 10
+
+
+ 287              		.fpu softvfp
+ 289              	_tm1637Start:
+ 290              	.LFB71:
+ 157:Src/stm32_tm1637.c ****     _tm1637ClkHigh(display);
+ 291              		.loc 1 157 1 is_stmt 1 view -0
+ 292              		.cfi_startproc
+ 293              		@ args = 0, pretend = 0, frame = 16
+ 294              		@ frame_needed = 0, uses_anonymous_args = 0
+ 295 0000 10B5     		push	{r4, lr}
+ 296              	.LCFI15:
+ 297              		.cfi_def_cfa_offset 8
+ 298              		.cfi_offset 4, -8
+ 299              		.cfi_offset 14, -4
+ 300 0002 84B0     		sub	sp, sp, #16
+ 301              	.LCFI16:
+ 302              		.cfi_def_cfa_offset 24
+ 303 0004 6C46     		mov	r4, sp
+ 304 0006 84E80F00 		stm	r4, {r0, r1, r2, r3}
+ 158:Src/stm32_tm1637.c ****     _tm1637DioHigh(display);
+ 305              		.loc 1 158 5 view .LVU34
+ 306 000a 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 307 000e FFF7FEFF 		bl	_tm1637ClkHigh
+ 308              	.LVL15:
+ 159:Src/stm32_tm1637.c ****     _tm1637DelayUsec(2);
+ 309              		.loc 1 159 5 view .LVU35
+ 310 0012 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 311 0016 FFF7FEFF 		bl	_tm1637DioHigh
+ 312              	.LVL16:
+ 160:Src/stm32_tm1637.c ****     _tm1637DioLow(display);
+ 313              		.loc 1 160 5 view .LVU36
+ 314 001a 0220     		movs	r0, #2
+ 315 001c FFF7FEFF 		bl	_tm1637DelayUsec
+ 316              	.LVL17:
+ 161:Src/stm32_tm1637.c **** }
+ 317              		.loc 1 161 5 view .LVU37
+ 318 0020 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 319 0024 FFF7FEFF 		bl	_tm1637DioLow
+ 320              	.LVL18:
+ 162:Src/stm32_tm1637.c **** 
+ 321              		.loc 1 162 1 is_stmt 0 view .LVU38
+ 322 0028 04B0     		add	sp, sp, #16
+ 323              	.LCFI17:
+ 324              		.cfi_def_cfa_offset 8
+ 325              		@ sp needed
+ 326 002a 10BD     		pop	{r4, pc}
+ 327              		.cfi_endproc
+ 328              	.LFE71:
+ 330              		.section	.text._tm1637Stop,"ax",%progbits
+ 331              		.align	1
+ 332              		.global	_tm1637Stop
+ 333              		.syntax unified
+ 334              		.thumb
+ 335              		.thumb_func
+ 336              		.fpu softvfp
+ 338              	_tm1637Stop:
+ 339              	.LFB72:
+ 165:Src/stm32_tm1637.c ****     _tm1637ClkLow(display);
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 11
+
+
+ 340              		.loc 1 165 1 is_stmt 1 view -0
+ 341              		.cfi_startproc
+ 342              		@ args = 0, pretend = 0, frame = 16
+ 343              		@ frame_needed = 0, uses_anonymous_args = 0
+ 344 0000 10B5     		push	{r4, lr}
+ 345              	.LCFI18:
+ 346              		.cfi_def_cfa_offset 8
+ 347              		.cfi_offset 4, -8
+ 348              		.cfi_offset 14, -4
+ 349 0002 84B0     		sub	sp, sp, #16
+ 350              	.LCFI19:
+ 351              		.cfi_def_cfa_offset 24
+ 352 0004 6C46     		mov	r4, sp
+ 353 0006 84E80F00 		stm	r4, {r0, r1, r2, r3}
+ 166:Src/stm32_tm1637.c ****     _tm1637DelayUsec(2);
+ 354              		.loc 1 166 5 view .LVU40
+ 355 000a 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 356 000e FFF7FEFF 		bl	_tm1637ClkLow
+ 357              	.LVL19:
+ 167:Src/stm32_tm1637.c ****     _tm1637DioLow(display);
+ 358              		.loc 1 167 5 view .LVU41
+ 359 0012 0220     		movs	r0, #2
+ 360 0014 FFF7FEFF 		bl	_tm1637DelayUsec
+ 361              	.LVL20:
+ 168:Src/stm32_tm1637.c ****     _tm1637DelayUsec(2);
+ 362              		.loc 1 168 5 view .LVU42
+ 363 0018 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 364 001c FFF7FEFF 		bl	_tm1637DioLow
+ 365              	.LVL21:
+ 169:Src/stm32_tm1637.c ****     _tm1637ClkHigh(display);
+ 366              		.loc 1 169 5 view .LVU43
+ 367 0020 0220     		movs	r0, #2
+ 368 0022 FFF7FEFF 		bl	_tm1637DelayUsec
+ 369              	.LVL22:
+ 170:Src/stm32_tm1637.c ****     _tm1637DelayUsec(2);
+ 370              		.loc 1 170 5 view .LVU44
+ 371 0026 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 372 002a FFF7FEFF 		bl	_tm1637ClkHigh
+ 373              	.LVL23:
+ 171:Src/stm32_tm1637.c ****     _tm1637DioHigh(display);
+ 374              		.loc 1 171 5 view .LVU45
+ 375 002e 0220     		movs	r0, #2
+ 376 0030 FFF7FEFF 		bl	_tm1637DelayUsec
+ 377              	.LVL24:
+ 172:Src/stm32_tm1637.c **** }
+ 378              		.loc 1 172 5 view .LVU46
+ 379 0034 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 380 0038 FFF7FEFF 		bl	_tm1637DioHigh
+ 381              	.LVL25:
+ 173:Src/stm32_tm1637.c **** 
+ 382              		.loc 1 173 1 is_stmt 0 view .LVU47
+ 383 003c 04B0     		add	sp, sp, #16
+ 384              	.LCFI20:
+ 385              		.cfi_def_cfa_offset 8
+ 386              		@ sp needed
+ 387 003e 10BD     		pop	{r4, pc}
+ 388              		.cfi_endproc
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 12
+
+
+ 389              	.LFE72:
+ 391              		.section	.text._tm1637WriteByte,"ax",%progbits
+ 392              		.align	1
+ 393              		.global	_tm1637WriteByte
+ 394              		.syntax unified
+ 395              		.thumb
+ 396              		.thumb_func
+ 397              		.fpu softvfp
+ 399              	_tm1637WriteByte:
+ 400              	.LVL26:
+ 401              	.LFB74:
+ 186:Src/stm32_tm1637.c ****     for (int i = 0; i < 8; ++i) {
+ 402              		.loc 1 186 1 is_stmt 1 view -0
+ 403              		.cfi_startproc
+ 404              		@ args = 4, pretend = 0, frame = 16
+ 405              		@ frame_needed = 0, uses_anonymous_args = 0
+ 186:Src/stm32_tm1637.c ****     for (int i = 0; i < 8; ++i) {
+ 406              		.loc 1 186 1 is_stmt 0 view .LVU49
+ 407 0000 30B5     		push	{r4, r5, lr}
+ 408              	.LCFI21:
+ 409              		.cfi_def_cfa_offset 12
+ 410              		.cfi_offset 4, -12
+ 411              		.cfi_offset 5, -8
+ 412              		.cfi_offset 14, -4
+ 413 0002 85B0     		sub	sp, sp, #20
+ 414              	.LCFI22:
+ 415              		.cfi_def_cfa_offset 32
+ 416 0004 04AC     		add	r4, sp, #16
+ 417 0006 04E90F00 		stmdb	r4, {r0, r1, r2, r3}
+ 418 000a 9DF82050 		ldrb	r5, [sp, #32]	@ zero_extendqisi2
+ 187:Src/stm32_tm1637.c ****         _tm1637ClkLow(display);
+ 419              		.loc 1 187 5 is_stmt 1 view .LVU50
+ 420              	.LBB3:
+ 187:Src/stm32_tm1637.c ****         _tm1637ClkLow(display);
+ 421              		.loc 1 187 10 view .LVU51
+ 422              	.LVL27:
+ 187:Src/stm32_tm1637.c ****         _tm1637ClkLow(display);
+ 423              		.loc 1 187 14 is_stmt 0 view .LVU52
+ 424 000e 0024     		movs	r4, #0
+ 187:Src/stm32_tm1637.c ****         _tm1637ClkLow(display);
+ 425              		.loc 1 187 5 view .LVU53
+ 426 0010 11E0     		b	.L23
+ 427              	.LVL28:
+ 428              	.L24:
+ 193:Src/stm32_tm1637.c ****         }
+ 429              		.loc 1 193 13 is_stmt 1 view .LVU54
+ 430 0012 04AB     		add	r3, sp, #16
+ 431 0014 13E90F00 		ldmdb	r3, {r0, r1, r2, r3}
+ 432 0018 FFF7FEFF 		bl	_tm1637DioLow
+ 433              	.LVL29:
+ 434              	.L25:
+ 195:Src/stm32_tm1637.c ****         b >>= 1;
+ 435              		.loc 1 195 9 discriminator 2 view .LVU55
+ 436 001c 0320     		movs	r0, #3
+ 437 001e FFF7FEFF 		bl	_tm1637DelayUsec
+ 438              	.LVL30:
+ 196:Src/stm32_tm1637.c ****         _tm1637ClkHigh(display);
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 13
+
+
+ 439              		.loc 1 196 9 discriminator 2 view .LVU56
+ 196:Src/stm32_tm1637.c ****         _tm1637ClkHigh(display);
+ 440              		.loc 1 196 11 is_stmt 0 discriminator 2 view .LVU57
+ 441 0022 6D08     		lsrs	r5, r5, #1
+ 442              	.LVL31:
+ 197:Src/stm32_tm1637.c ****         _tm1637DelayUsec(3);
+ 443              		.loc 1 197 9 is_stmt 1 discriminator 2 view .LVU58
+ 444 0024 04AB     		add	r3, sp, #16
+ 445 0026 13E90F00 		ldmdb	r3, {r0, r1, r2, r3}
+ 446 002a FFF7FEFF 		bl	_tm1637ClkHigh
+ 447              	.LVL32:
+ 198:Src/stm32_tm1637.c ****     }
+ 448              		.loc 1 198 9 discriminator 2 view .LVU59
+ 449 002e 0320     		movs	r0, #3
+ 450 0030 FFF7FEFF 		bl	_tm1637DelayUsec
+ 451              	.LVL33:
+ 187:Src/stm32_tm1637.c ****         _tm1637ClkLow(display);
+ 452              		.loc 1 187 28 discriminator 2 view .LVU60
+ 453 0034 0134     		adds	r4, r4, #1
+ 454              	.LVL34:
+ 455              	.L23:
+ 187:Src/stm32_tm1637.c ****         _tm1637ClkLow(display);
+ 456              		.loc 1 187 21 discriminator 1 view .LVU61
+ 187:Src/stm32_tm1637.c ****         _tm1637ClkLow(display);
+ 457              		.loc 1 187 5 is_stmt 0 discriminator 1 view .LVU62
+ 458 0036 072C     		cmp	r4, #7
+ 459 0038 0DDC     		bgt	.L28
+ 188:Src/stm32_tm1637.c ****         if (b & 0x01) {
+ 460              		.loc 1 188 9 is_stmt 1 view .LVU63
+ 461 003a 04AB     		add	r3, sp, #16
+ 462 003c 13E90F00 		ldmdb	r3, {r0, r1, r2, r3}
+ 463 0040 FFF7FEFF 		bl	_tm1637ClkLow
+ 464              	.LVL35:
+ 189:Src/stm32_tm1637.c ****             _tm1637DioHigh(display);
+ 465              		.loc 1 189 9 view .LVU64
+ 189:Src/stm32_tm1637.c ****             _tm1637DioHigh(display);
+ 466              		.loc 1 189 12 is_stmt 0 view .LVU65
+ 467 0044 15F0010F 		tst	r5, #1
+ 468 0048 E3D0     		beq	.L24
+ 190:Src/stm32_tm1637.c ****         }
+ 469              		.loc 1 190 13 is_stmt 1 view .LVU66
+ 470 004a 04AB     		add	r3, sp, #16
+ 471 004c 13E90F00 		ldmdb	r3, {r0, r1, r2, r3}
+ 472 0050 FFF7FEFF 		bl	_tm1637DioHigh
+ 473              	.LVL36:
+ 474 0054 E2E7     		b	.L25
+ 475              	.L28:
+ 476              	.LBE3:
+ 200:Src/stm32_tm1637.c **** 
+ 477              		.loc 1 200 1 is_stmt 0 view .LVU67
+ 478 0056 05B0     		add	sp, sp, #20
+ 479              	.LCFI23:
+ 480              		.cfi_def_cfa_offset 12
+ 481              		@ sp needed
+ 482 0058 30BD     		pop	{r4, r5, pc}
+ 200:Src/stm32_tm1637.c **** 
+ 483              		.loc 1 200 1 view .LVU68
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 14
+
+
+ 484              		.cfi_endproc
+ 485              	.LFE74:
+ 487              		.section	.text.tm1637DisplayDecimal,"ax",%progbits
+ 488              		.align	1
+ 489              		.global	tm1637DisplayDecimal
+ 490              		.syntax unified
+ 491              		.thumb
+ 492              		.thumb_func
+ 493              		.fpu softvfp
+ 495              	tm1637DisplayDecimal:
+ 496              	.LVL37:
+ 497              	.LFB67:
+  66:Src/stm32_tm1637.c ****     unsigned char digitArr[4];
+ 498              		.loc 1 66 1 is_stmt 1 view -0
+ 499              		.cfi_startproc
+ 500              		@ args = 8, pretend = 0, frame = 24
+ 501              		@ frame_needed = 0, uses_anonymous_args = 0
+  66:Src/stm32_tm1637.c ****     unsigned char digitArr[4];
+ 502              		.loc 1 66 1 is_stmt 0 view .LVU70
+ 503 0000 30B5     		push	{r4, r5, lr}
+ 504              	.LCFI24:
+ 505              		.cfi_def_cfa_offset 12
+ 506              		.cfi_offset 4, -12
+ 507              		.cfi_offset 5, -8
+ 508              		.cfi_offset 14, -4
+ 509 0002 89B0     		sub	sp, sp, #36
+ 510              	.LCFI25:
+ 511              		.cfi_def_cfa_offset 48
+ 512 0004 02AC     		add	r4, sp, #8
+ 513 0006 84E80F00 		stm	r4, {r0, r1, r2, r3}
+ 514 000a 0C9A     		ldr	r2, [sp, #48]
+  67:Src/stm32_tm1637.c ****     for (int i = 0; i < 4; ++i) {
+ 515              		.loc 1 67 5 is_stmt 1 view .LVU71
+  68:Src/stm32_tm1637.c ****         digitArr[i] = segmentMap[v % 10];
+ 516              		.loc 1 68 5 view .LVU72
+ 517              	.LBB4:
+  68:Src/stm32_tm1637.c ****         digitArr[i] = segmentMap[v % 10];
+ 518              		.loc 1 68 10 view .LVU73
+ 519              	.LVL38:
+  68:Src/stm32_tm1637.c ****         digitArr[i] = segmentMap[v % 10];
+ 520              		.loc 1 68 14 is_stmt 0 view .LVU74
+ 521 000c 0020     		movs	r0, #0
+  68:Src/stm32_tm1637.c ****         digitArr[i] = segmentMap[v % 10];
+ 522              		.loc 1 68 5 view .LVU75
+ 523 000e 06E0     		b	.L30
+ 524              	.LVL39:
+ 525              	.L31:
+  73:Src/stm32_tm1637.c ****     }
+ 526              		.loc 1 73 9 is_stmt 1 discriminator 2 view .LVU76
+  73:Src/stm32_tm1637.c ****     }
+ 527              		.loc 1 73 11 is_stmt 0 discriminator 2 view .LVU77
+ 528 0010 304B     		ldr	r3, .L37
+ 529 0012 83FB0213 		smull	r1, r3, r3, r2
+ 530 0016 D217     		asrs	r2, r2, #31
+ 531              	.LVL40:
+  73:Src/stm32_tm1637.c ****     }
+ 532              		.loc 1 73 11 discriminator 2 view .LVU78
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 15
+
+
+ 533 0018 C2EBA302 		rsb	r2, r2, r3, asr #2
+ 534              	.LVL41:
+  68:Src/stm32_tm1637.c ****         digitArr[i] = segmentMap[v % 10];
+ 535              		.loc 1 68 28 is_stmt 1 discriminator 2 view .LVU79
+ 536 001c 0130     		adds	r0, r0, #1
+ 537              	.LVL42:
+ 538              	.L30:
+  68:Src/stm32_tm1637.c ****         digitArr[i] = segmentMap[v % 10];
+ 539              		.loc 1 68 21 discriminator 1 view .LVU80
+  68:Src/stm32_tm1637.c ****         digitArr[i] = segmentMap[v % 10];
+ 540              		.loc 1 68 5 is_stmt 0 discriminator 1 view .LVU81
+ 541 001e 0328     		cmp	r0, #3
+ 542 0020 1BDC     		bgt	.L36
+  69:Src/stm32_tm1637.c ****         if (i == 2 && displaySeparator) {
+ 543              		.loc 1 69 9 is_stmt 1 view .LVU82
+  69:Src/stm32_tm1637.c ****         if (i == 2 && displaySeparator) {
+ 544              		.loc 1 69 36 is_stmt 0 view .LVU83
+ 545 0022 2C49     		ldr	r1, .L37
+ 546 0024 81FB0231 		smull	r3, r1, r1, r2
+ 547 0028 D317     		asrs	r3, r2, #31
+ 548 002a C3EBA103 		rsb	r3, r3, r1, asr #2
+ 549 002e 03EB8303 		add	r3, r3, r3, lsl #2
+ 550 0032 5900     		lsls	r1, r3, #1
+ 551 0034 531A     		subs	r3, r2, r1
+  69:Src/stm32_tm1637.c ****         if (i == 2 && displaySeparator) {
+ 552              		.loc 1 69 33 view .LVU84
+ 553 0036 2849     		ldr	r1, .L37+4
+ 554 0038 CB5C     		ldrb	r3, [r1, r3]	@ zero_extendqisi2
+  69:Src/stm32_tm1637.c ****         if (i == 2 && displaySeparator) {
+ 555              		.loc 1 69 21 view .LVU85
+ 556 003a 08A9     		add	r1, sp, #32
+ 557 003c 0144     		add	r1, r1, r0
+ 558 003e 01F8043C 		strb	r3, [r1, #-4]
+  70:Src/stm32_tm1637.c ****             digitArr[i] |= 1 << 7;
+ 559              		.loc 1 70 9 is_stmt 1 view .LVU86
+  70:Src/stm32_tm1637.c ****             digitArr[i] |= 1 << 7;
+ 560              		.loc 1 70 12 is_stmt 0 view .LVU87
+ 561 0042 0228     		cmp	r0, #2
+ 562 0044 E4D1     		bne	.L31
+  70:Src/stm32_tm1637.c ****             digitArr[i] |= 1 << 7;
+ 563              		.loc 1 70 20 discriminator 1 view .LVU88
+ 564 0046 0D99     		ldr	r1, [sp, #52]
+ 565 0048 0029     		cmp	r1, #0
+ 566 004a E1D0     		beq	.L31
+  71:Src/stm32_tm1637.c ****         }
+ 567              		.loc 1 71 13 is_stmt 1 view .LVU89
+  71:Src/stm32_tm1637.c ****         }
+ 568              		.loc 1 71 25 is_stmt 0 view .LVU90
+ 569 004c 63F07F03 		orn	r3, r3, #127
+ 570 0050 08A9     		add	r1, sp, #32
+ 571 0052 0144     		add	r1, r1, r0
+ 572 0054 01F8043C 		strb	r3, [r1, #-4]
+ 573 0058 DAE7     		b	.L31
+ 574              	.L36:
+ 575              	.LBE4:
+  76:Src/stm32_tm1637.c ****     _tm1637WriteByte(display, 0x40);
+ 576              		.loc 1 76 5 is_stmt 1 view .LVU91
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 16
+
+
+ 577 005a 02AC     		add	r4, sp, #8
+ 578 005c 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 579              	.LVL43:
+  76:Src/stm32_tm1637.c ****     _tm1637WriteByte(display, 0x40);
+ 580              		.loc 1 76 5 is_stmt 0 view .LVU92
+ 581 0060 FFF7FEFF 		bl	_tm1637Start
+ 582              	.LVL44:
+  77:Src/stm32_tm1637.c ****     _tm1637ReadResult(display);
+ 583              		.loc 1 77 5 is_stmt 1 view .LVU93
+ 584 0064 4023     		movs	r3, #64
+ 585 0066 0093     		str	r3, [sp]
+ 586 0068 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 587 006c FFF7FEFF 		bl	_tm1637WriteByte
+ 588              	.LVL45:
+  78:Src/stm32_tm1637.c ****     _tm1637Stop(display);
+ 589              		.loc 1 78 5 view .LVU94
+ 590 0070 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 591 0074 FFF7FEFF 		bl	_tm1637ReadResult
+ 592              	.LVL46:
+  79:Src/stm32_tm1637.c **** 
+ 593              		.loc 1 79 5 view .LVU95
+ 594 0078 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 595 007c FFF7FEFF 		bl	_tm1637Stop
+ 596              	.LVL47:
+  81:Src/stm32_tm1637.c ****     _tm1637WriteByte(display, 0xc0);
+ 597              		.loc 1 81 5 view .LVU96
+ 598 0080 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 599 0084 FFF7FEFF 		bl	_tm1637Start
+ 600              	.LVL48:
+  82:Src/stm32_tm1637.c ****     _tm1637ReadResult(display);
+ 601              		.loc 1 82 5 view .LVU97
+ 602 0088 C023     		movs	r3, #192
+ 603 008a 0093     		str	r3, [sp]
+ 604 008c 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 605 0090 FFF7FEFF 		bl	_tm1637WriteByte
+ 606              	.LVL49:
+  83:Src/stm32_tm1637.c **** 
+ 607              		.loc 1 83 5 view .LVU98
+ 608 0094 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 609 0098 FFF7FEFF 		bl	_tm1637ReadResult
+ 610              	.LVL50:
+  85:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[3 - i]);
+ 611              		.loc 1 85 5 view .LVU99
+ 612              	.LBB5:
+  85:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[3 - i]);
+ 613              		.loc 1 85 10 view .LVU100
+  85:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[3 - i]);
+ 614              		.loc 1 85 14 is_stmt 0 view .LVU101
+ 615 009c 0025     		movs	r5, #0
+  85:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[3 - i]);
+ 616              		.loc 1 85 5 view .LVU102
+ 617 009e 10E0     		b	.L33
+ 618              	.LVL51:
+ 619              	.L34:
+  86:Src/stm32_tm1637.c ****         _tm1637ReadResult(display);
+ 620              		.loc 1 86 9 is_stmt 1 discriminator 3 view .LVU103
+  86:Src/stm32_tm1637.c ****         _tm1637ReadResult(display);
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 17
+
+
+ 621              		.loc 1 86 46 is_stmt 0 discriminator 3 view .LVU104
+ 622 00a0 C5F10303 		rsb	r3, r5, #3
+  86:Src/stm32_tm1637.c ****         _tm1637ReadResult(display);
+ 623              		.loc 1 86 9 discriminator 3 view .LVU105
+ 624 00a4 08AA     		add	r2, sp, #32
+ 625 00a6 1344     		add	r3, r3, r2
+ 626 00a8 13F8043C 		ldrb	r3, [r3, #-4]	@ zero_extendqisi2
+ 627 00ac 0093     		str	r3, [sp]
+ 628 00ae 02AC     		add	r4, sp, #8
+ 629 00b0 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 630 00b4 FFF7FEFF 		bl	_tm1637WriteByte
+ 631              	.LVL52:
+  87:Src/stm32_tm1637.c ****     }
+ 632              		.loc 1 87 9 is_stmt 1 discriminator 3 view .LVU106
+ 633 00b8 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 634 00bc FFF7FEFF 		bl	_tm1637ReadResult
+ 635              	.LVL53:
+  85:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[3 - i]);
+ 636              		.loc 1 85 28 discriminator 3 view .LVU107
+ 637 00c0 0135     		adds	r5, r5, #1
+ 638              	.LVL54:
+ 639              	.L33:
+  85:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[3 - i]);
+ 640              		.loc 1 85 21 discriminator 1 view .LVU108
+  85:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[3 - i]);
+ 641              		.loc 1 85 5 is_stmt 0 discriminator 1 view .LVU109
+ 642 00c2 032D     		cmp	r5, #3
+ 643 00c4 ECDD     		ble	.L34
+ 644              	.LBE5:
+  90:Src/stm32_tm1637.c **** }
+ 645              		.loc 1 90 5 is_stmt 1 view .LVU110
+ 646 00c6 02AB     		add	r3, sp, #8
+ 647 00c8 0FCB     		ldm	r3, {r0, r1, r2, r3}
+ 648 00ca FFF7FEFF 		bl	_tm1637Stop
+ 649              	.LVL55:
+  91:Src/stm32_tm1637.c **** 
+ 650              		.loc 1 91 1 is_stmt 0 view .LVU111
+ 651 00ce 09B0     		add	sp, sp, #36
+ 652              	.LCFI26:
+ 653              		.cfi_def_cfa_offset 12
+ 654              		@ sp needed
+ 655 00d0 30BD     		pop	{r4, r5, pc}
+ 656              	.LVL56:
+ 657              	.L38:
+  91:Src/stm32_tm1637.c **** 
+ 658              		.loc 1 91 1 view .LVU112
+ 659 00d2 00BF     		.align	2
+ 660              	.L37:
+ 661 00d4 67666666 		.word	1717986919
+ 662 00d8 00000000 		.word	.LANCHOR0
+ 663              		.cfi_endproc
+ 664              	.LFE67:
+ 666              		.section	.text.tm1637DisplayText,"ax",%progbits
+ 667              		.align	1
+ 668              		.global	tm1637DisplayText
+ 669              		.syntax unified
+ 670              		.thumb
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 18
+
+
+ 671              		.thumb_func
+ 672              		.fpu softvfp
+ 674              	tm1637DisplayText:
+ 675              	.LVL57:
+ 676              	.LFB68:
+  94:Src/stm32_tm1637.c ****     unsigned char digitArr[4];
+ 677              		.loc 1 94 1 is_stmt 1 view -0
+ 678              		.cfi_startproc
+ 679              		@ args = 4, pretend = 0, frame = 24
+ 680              		@ frame_needed = 0, uses_anonymous_args = 0
+  94:Src/stm32_tm1637.c ****     unsigned char digitArr[4];
+ 681              		.loc 1 94 1 is_stmt 0 view .LVU114
+ 682 0000 30B5     		push	{r4, r5, lr}
+ 683              	.LCFI27:
+ 684              		.cfi_def_cfa_offset 12
+ 685              		.cfi_offset 4, -12
+ 686              		.cfi_offset 5, -8
+ 687              		.cfi_offset 14, -4
+ 688 0002 89B0     		sub	sp, sp, #36
+ 689              	.LCFI28:
+ 690              		.cfi_def_cfa_offset 48
+ 691 0004 02AC     		add	r4, sp, #8
+ 692 0006 84E80F00 		stm	r4, {r0, r1, r2, r3}
+ 693 000a 9DF83000 		ldrb	r0, [sp, #48]	@ zero_extendqisi2
+  95:Src/stm32_tm1637.c ****     for (int i = 0; i < 4; ++i) {
+ 694              		.loc 1 95 5 is_stmt 1 view .LVU115
+  96:Src/stm32_tm1637.c ****         digitArr[i] = wordSegmentMap[type][i];
+ 695              		.loc 1 96 5 view .LVU116
+ 696              	.LBB6:
+  96:Src/stm32_tm1637.c ****         digitArr[i] = wordSegmentMap[type][i];
+ 697              		.loc 1 96 10 view .LVU117
+ 698              	.LVL58:
+  96:Src/stm32_tm1637.c ****         digitArr[i] = wordSegmentMap[type][i];
+ 699              		.loc 1 96 14 is_stmt 0 view .LVU118
+ 700 000e 0023     		movs	r3, #0
+  96:Src/stm32_tm1637.c ****         digitArr[i] = wordSegmentMap[type][i];
+ 701              		.loc 1 96 5 view .LVU119
+ 702 0010 08E0     		b	.L40
+ 703              	.LVL59:
+ 704              	.L41:
+  97:Src/stm32_tm1637.c ****     }
+ 705              		.loc 1 97 9 is_stmt 1 discriminator 3 view .LVU120
+  97:Src/stm32_tm1637.c ****     }
+ 706              		.loc 1 97 43 is_stmt 0 discriminator 3 view .LVU121
+ 707 0012 224A     		ldr	r2, .L45
+ 708 0014 02EB8002 		add	r2, r2, r0, lsl #2
+ 709 0018 D15C     		ldrb	r1, [r2, r3]	@ zero_extendqisi2
+  97:Src/stm32_tm1637.c ****     }
+ 710              		.loc 1 97 21 discriminator 3 view .LVU122
+ 711 001a 08AA     		add	r2, sp, #32
+ 712 001c 1A44     		add	r2, r2, r3
+ 713 001e 02F8041C 		strb	r1, [r2, #-4]
+  96:Src/stm32_tm1637.c ****         digitArr[i] = wordSegmentMap[type][i];
+ 714              		.loc 1 96 28 is_stmt 1 discriminator 3 view .LVU123
+ 715 0022 0133     		adds	r3, r3, #1
+ 716              	.LVL60:
+ 717              	.L40:
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 19
+
+
+  96:Src/stm32_tm1637.c ****         digitArr[i] = wordSegmentMap[type][i];
+ 718              		.loc 1 96 21 discriminator 1 view .LVU124
+  96:Src/stm32_tm1637.c ****         digitArr[i] = wordSegmentMap[type][i];
+ 719              		.loc 1 96 5 is_stmt 0 discriminator 1 view .LVU125
+ 720 0024 032B     		cmp	r3, #3
+ 721 0026 F4DD     		ble	.L41
+ 722              	.LBE6:
+ 100:Src/stm32_tm1637.c ****     _tm1637WriteByte(display, 0x40);
+ 723              		.loc 1 100 5 is_stmt 1 view .LVU126
+ 724 0028 02AC     		add	r4, sp, #8
+ 725 002a 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 726              	.LVL61:
+ 100:Src/stm32_tm1637.c ****     _tm1637WriteByte(display, 0x40);
+ 727              		.loc 1 100 5 is_stmt 0 view .LVU127
+ 728 002e FFF7FEFF 		bl	_tm1637Start
+ 729              	.LVL62:
+ 101:Src/stm32_tm1637.c ****     _tm1637ReadResult(display);
+ 730              		.loc 1 101 5 is_stmt 1 view .LVU128
+ 731 0032 4023     		movs	r3, #64
+ 732 0034 0093     		str	r3, [sp]
+ 733 0036 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 734 003a FFF7FEFF 		bl	_tm1637WriteByte
+ 735              	.LVL63:
+ 102:Src/stm32_tm1637.c ****     _tm1637Stop(display);
+ 736              		.loc 1 102 5 view .LVU129
+ 737 003e 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 738 0042 FFF7FEFF 		bl	_tm1637ReadResult
+ 739              	.LVL64:
+ 103:Src/stm32_tm1637.c **** 
+ 740              		.loc 1 103 5 view .LVU130
+ 741 0046 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 742 004a FFF7FEFF 		bl	_tm1637Stop
+ 743              	.LVL65:
+ 105:Src/stm32_tm1637.c ****     _tm1637WriteByte(display, 0xc0);
+ 744              		.loc 1 105 5 view .LVU131
+ 745 004e 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 746 0052 FFF7FEFF 		bl	_tm1637Start
+ 747              	.LVL66:
+ 106:Src/stm32_tm1637.c ****     _tm1637ReadResult(display);
+ 748              		.loc 1 106 5 view .LVU132
+ 749 0056 C023     		movs	r3, #192
+ 750 0058 0093     		str	r3, [sp]
+ 751 005a 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 752 005e FFF7FEFF 		bl	_tm1637WriteByte
+ 753              	.LVL67:
+ 107:Src/stm32_tm1637.c **** 
+ 754              		.loc 1 107 5 view .LVU133
+ 755 0062 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 756 0066 FFF7FEFF 		bl	_tm1637ReadResult
+ 757              	.LVL68:
+ 109:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[i]);
+ 758              		.loc 1 109 5 view .LVU134
+ 759              	.LBB7:
+ 109:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[i]);
+ 760              		.loc 1 109 10 view .LVU135
+ 109:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[i]);
+ 761              		.loc 1 109 14 is_stmt 0 view .LVU136
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 20
+
+
+ 762 006a 0025     		movs	r5, #0
+ 109:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[i]);
+ 763              		.loc 1 109 5 view .LVU137
+ 764 006c 0EE0     		b	.L42
+ 765              	.LVL69:
+ 766              	.L43:
+ 110:Src/stm32_tm1637.c ****         _tm1637ReadResult(display);
+ 767              		.loc 1 110 9 is_stmt 1 discriminator 3 view .LVU138
+ 768 006e 08AB     		add	r3, sp, #32
+ 769 0070 2B44     		add	r3, r3, r5
+ 770 0072 13F8043C 		ldrb	r3, [r3, #-4]	@ zero_extendqisi2
+ 771 0076 0093     		str	r3, [sp]
+ 772 0078 02AC     		add	r4, sp, #8
+ 773 007a 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 774 007e FFF7FEFF 		bl	_tm1637WriteByte
+ 775              	.LVL70:
+ 111:Src/stm32_tm1637.c ****     }
+ 776              		.loc 1 111 9 discriminator 3 view .LVU139
+ 777 0082 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 778 0086 FFF7FEFF 		bl	_tm1637ReadResult
+ 779              	.LVL71:
+ 109:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[i]);
+ 780              		.loc 1 109 28 discriminator 3 view .LVU140
+ 781 008a 0135     		adds	r5, r5, #1
+ 782              	.LVL72:
+ 783              	.L42:
+ 109:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[i]);
+ 784              		.loc 1 109 21 discriminator 1 view .LVU141
+ 109:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[i]);
+ 785              		.loc 1 109 5 is_stmt 0 discriminator 1 view .LVU142
+ 786 008c 032D     		cmp	r5, #3
+ 787 008e EEDD     		ble	.L43
+ 788              	.LBE7:
+ 114:Src/stm32_tm1637.c **** }
+ 789              		.loc 1 114 5 is_stmt 1 view .LVU143
+ 790 0090 02AB     		add	r3, sp, #8
+ 791 0092 0FCB     		ldm	r3, {r0, r1, r2, r3}
+ 792 0094 FFF7FEFF 		bl	_tm1637Stop
+ 793              	.LVL73:
+ 115:Src/stm32_tm1637.c **** 
+ 794              		.loc 1 115 1 is_stmt 0 view .LVU144
+ 795 0098 09B0     		add	sp, sp, #36
+ 796              	.LCFI29:
+ 797              		.cfi_def_cfa_offset 12
+ 798              		@ sp needed
+ 799 009a 30BD     		pop	{r4, r5, pc}
+ 800              	.LVL74:
+ 801              	.L46:
+ 115:Src/stm32_tm1637.c **** 
+ 802              		.loc 1 115 1 view .LVU145
+ 803              		.align	2
+ 804              	.L45:
+ 805 009c 00000000 		.word	.LANCHOR1
+ 806              		.cfi_endproc
+ 807              	.LFE68:
+ 809              		.section	.text.tm1637DisplayClear,"ax",%progbits
+ 810              		.align	1
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 21
+
+
+ 811              		.global	tm1637DisplayClear
+ 812              		.syntax unified
+ 813              		.thumb
+ 814              		.thumb_func
+ 815              		.fpu softvfp
+ 817              	tm1637DisplayClear:
+ 818              	.LFB69:
+ 118:Src/stm32_tm1637.c ****     unsigned char digitArr[4];
+ 819              		.loc 1 118 1 is_stmt 1 view -0
+ 820              		.cfi_startproc
+ 821              		@ args = 0, pretend = 0, frame = 24
+ 822              		@ frame_needed = 0, uses_anonymous_args = 0
+ 823 0000 30B5     		push	{r4, r5, lr}
+ 824              	.LCFI30:
+ 825              		.cfi_def_cfa_offset 12
+ 826              		.cfi_offset 4, -12
+ 827              		.cfi_offset 5, -8
+ 828              		.cfi_offset 14, -4
+ 829 0002 89B0     		sub	sp, sp, #36
+ 830              	.LCFI31:
+ 831              		.cfi_def_cfa_offset 48
+ 832 0004 02AC     		add	r4, sp, #8
+ 833 0006 84E80F00 		stm	r4, {r0, r1, r2, r3}
+ 119:Src/stm32_tm1637.c ****     for (int i = 0; i < 4; ++i) {
+ 834              		.loc 1 119 5 view .LVU147
+ 120:Src/stm32_tm1637.c ****         digitArr[i] = 0;
+ 835              		.loc 1 120 5 view .LVU148
+ 836              	.LBB8:
+ 120:Src/stm32_tm1637.c ****         digitArr[i] = 0;
+ 837              		.loc 1 120 10 view .LVU149
+ 838              	.LVL75:
+ 120:Src/stm32_tm1637.c ****         digitArr[i] = 0;
+ 839              		.loc 1 120 14 is_stmt 0 view .LVU150
+ 840 000a 0023     		movs	r3, #0
+ 120:Src/stm32_tm1637.c ****         digitArr[i] = 0;
+ 841              		.loc 1 120 5 view .LVU151
+ 842 000c 05E0     		b	.L48
+ 843              	.LVL76:
+ 844              	.L49:
+ 121:Src/stm32_tm1637.c ****     }
+ 845              		.loc 1 121 9 is_stmt 1 discriminator 3 view .LVU152
+ 121:Src/stm32_tm1637.c ****     }
+ 846              		.loc 1 121 21 is_stmt 0 discriminator 3 view .LVU153
+ 847 000e 08AA     		add	r2, sp, #32
+ 848 0010 1A44     		add	r2, r2, r3
+ 849 0012 0021     		movs	r1, #0
+ 850 0014 02F8041C 		strb	r1, [r2, #-4]
+ 120:Src/stm32_tm1637.c ****         digitArr[i] = 0;
+ 851              		.loc 1 120 28 is_stmt 1 discriminator 3 view .LVU154
+ 852 0018 0133     		adds	r3, r3, #1
+ 853              	.LVL77:
+ 854              	.L48:
+ 120:Src/stm32_tm1637.c ****         digitArr[i] = 0;
+ 855              		.loc 1 120 21 discriminator 1 view .LVU155
+ 120:Src/stm32_tm1637.c ****         digitArr[i] = 0;
+ 856              		.loc 1 120 5 is_stmt 0 discriminator 1 view .LVU156
+ 857 001a 032B     		cmp	r3, #3
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 22
+
+
+ 858 001c F7DD     		ble	.L49
+ 859              	.LBE8:
+ 124:Src/stm32_tm1637.c ****     _tm1637WriteByte(display, 0x40);
+ 860              		.loc 1 124 5 is_stmt 1 view .LVU157
+ 861 001e 02AC     		add	r4, sp, #8
+ 862 0020 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 863              	.LVL78:
+ 124:Src/stm32_tm1637.c ****     _tm1637WriteByte(display, 0x40);
+ 864              		.loc 1 124 5 is_stmt 0 view .LVU158
+ 865 0024 FFF7FEFF 		bl	_tm1637Start
+ 866              	.LVL79:
+ 125:Src/stm32_tm1637.c ****     _tm1637ReadResult(display);
+ 867              		.loc 1 125 5 is_stmt 1 view .LVU159
+ 868 0028 4023     		movs	r3, #64
+ 869 002a 0093     		str	r3, [sp]
+ 870 002c 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 871 0030 FFF7FEFF 		bl	_tm1637WriteByte
+ 872              	.LVL80:
+ 126:Src/stm32_tm1637.c ****     _tm1637Stop(display);
+ 873              		.loc 1 126 5 view .LVU160
+ 874 0034 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 875 0038 FFF7FEFF 		bl	_tm1637ReadResult
+ 876              	.LVL81:
+ 127:Src/stm32_tm1637.c **** 
+ 877              		.loc 1 127 5 view .LVU161
+ 878 003c 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 879 0040 FFF7FEFF 		bl	_tm1637Stop
+ 880              	.LVL82:
+ 129:Src/stm32_tm1637.c ****     _tm1637WriteByte(display, 0xc0);
+ 881              		.loc 1 129 5 view .LVU162
+ 882 0044 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 883 0048 FFF7FEFF 		bl	_tm1637Start
+ 884              	.LVL83:
+ 130:Src/stm32_tm1637.c ****     _tm1637ReadResult(display);
+ 885              		.loc 1 130 5 view .LVU163
+ 886 004c C023     		movs	r3, #192
+ 887 004e 0093     		str	r3, [sp]
+ 888 0050 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 889 0054 FFF7FEFF 		bl	_tm1637WriteByte
+ 890              	.LVL84:
+ 131:Src/stm32_tm1637.c **** 
+ 891              		.loc 1 131 5 view .LVU164
+ 892 0058 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 893 005c FFF7FEFF 		bl	_tm1637ReadResult
+ 894              	.LVL85:
+ 133:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[i]);
+ 895              		.loc 1 133 5 view .LVU165
+ 896              	.LBB9:
+ 133:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[i]);
+ 897              		.loc 1 133 10 view .LVU166
+ 133:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[i]);
+ 898              		.loc 1 133 14 is_stmt 0 view .LVU167
+ 899 0060 0025     		movs	r5, #0
+ 133:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[i]);
+ 900              		.loc 1 133 5 view .LVU168
+ 901 0062 0EE0     		b	.L50
+ 902              	.LVL86:
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 23
+
+
+ 903              	.L51:
+ 134:Src/stm32_tm1637.c ****         _tm1637ReadResult(display);
+ 904              		.loc 1 134 9 is_stmt 1 discriminator 3 view .LVU169
+ 905 0064 08AB     		add	r3, sp, #32
+ 906 0066 2B44     		add	r3, r3, r5
+ 907 0068 13F8043C 		ldrb	r3, [r3, #-4]	@ zero_extendqisi2
+ 908 006c 0093     		str	r3, [sp]
+ 909 006e 02AC     		add	r4, sp, #8
+ 910 0070 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 911 0074 FFF7FEFF 		bl	_tm1637WriteByte
+ 912              	.LVL87:
+ 135:Src/stm32_tm1637.c ****     }
+ 913              		.loc 1 135 9 discriminator 3 view .LVU170
+ 914 0078 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 915 007c FFF7FEFF 		bl	_tm1637ReadResult
+ 916              	.LVL88:
+ 133:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[i]);
+ 917              		.loc 1 133 28 discriminator 3 view .LVU171
+ 918 0080 0135     		adds	r5, r5, #1
+ 919              	.LVL89:
+ 920              	.L50:
+ 133:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[i]);
+ 921              		.loc 1 133 21 discriminator 1 view .LVU172
+ 133:Src/stm32_tm1637.c ****         _tm1637WriteByte(display, digitArr[i]);
+ 922              		.loc 1 133 5 is_stmt 0 discriminator 1 view .LVU173
+ 923 0082 032D     		cmp	r5, #3
+ 924 0084 EEDD     		ble	.L51
+ 925              	.LBE9:
+ 138:Src/stm32_tm1637.c **** }
+ 926              		.loc 1 138 5 is_stmt 1 view .LVU174
+ 927 0086 02AB     		add	r3, sp, #8
+ 928 0088 0FCB     		ldm	r3, {r0, r1, r2, r3}
+ 929 008a FFF7FEFF 		bl	_tm1637Stop
+ 930              	.LVL90:
+ 139:Src/stm32_tm1637.c **** 
+ 931              		.loc 1 139 1 is_stmt 0 view .LVU175
+ 932 008e 09B0     		add	sp, sp, #36
+ 933              	.LCFI32:
+ 934              		.cfi_def_cfa_offset 12
+ 935              		@ sp needed
+ 936 0090 30BD     		pop	{r4, r5, pc}
+ 139:Src/stm32_tm1637.c **** 
+ 937              		.loc 1 139 1 view .LVU176
+ 938              		.cfi_endproc
+ 939              	.LFE69:
+ 941              		.section	.text.tm1637SetBrightness,"ax",%progbits
+ 942              		.align	1
+ 943              		.global	tm1637SetBrightness
+ 944              		.syntax unified
+ 945              		.thumb
+ 946              		.thumb_func
+ 947              		.fpu softvfp
+ 949              	tm1637SetBrightness:
+ 950              	.LVL91:
+ 951              	.LFB70:
+ 144:Src/stm32_tm1637.c ****     // Brightness command:
+ 952              		.loc 1 144 1 is_stmt 1 view -0
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 24
+
+
+ 953              		.cfi_startproc
+ 954              		@ args = 4, pretend = 0, frame = 16
+ 955              		@ frame_needed = 0, uses_anonymous_args = 0
+ 144:Src/stm32_tm1637.c ****     // Brightness command:
+ 956              		.loc 1 144 1 is_stmt 0 view .LVU178
+ 957 0000 10B5     		push	{r4, lr}
+ 958              	.LCFI33:
+ 959              		.cfi_def_cfa_offset 8
+ 960              		.cfi_offset 4, -8
+ 961              		.cfi_offset 14, -4
+ 962 0002 86B0     		sub	sp, sp, #24
+ 963              	.LCFI34:
+ 964              		.cfi_def_cfa_offset 32
+ 965 0004 02AC     		add	r4, sp, #8
+ 966 0006 84E80F00 		stm	r4, {r0, r1, r2, r3}
+ 150:Src/stm32_tm1637.c ****     _tm1637WriteByte(display, 0x87 + brightness);
+ 967              		.loc 1 150 5 is_stmt 1 view .LVU179
+ 968 000a 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 969 000e FFF7FEFF 		bl	_tm1637Start
+ 970              	.LVL92:
+ 151:Src/stm32_tm1637.c ****     _tm1637ReadResult(display);
+ 971              		.loc 1 151 5 view .LVU180
+ 972 0012 9DF82030 		ldrb	r3, [sp, #32]	@ zero_extendqisi2
+ 973 0016 793B     		subs	r3, r3, #121
+ 974 0018 DBB2     		uxtb	r3, r3
+ 975 001a 0093     		str	r3, [sp]
+ 976 001c 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 977 0020 FFF7FEFF 		bl	_tm1637WriteByte
+ 978              	.LVL93:
+ 152:Src/stm32_tm1637.c ****     _tm1637Stop(display);
+ 979              		.loc 1 152 5 view .LVU181
+ 980 0024 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 981 0028 FFF7FEFF 		bl	_tm1637ReadResult
+ 982              	.LVL94:
+ 153:Src/stm32_tm1637.c **** }
+ 983              		.loc 1 153 5 view .LVU182
+ 984 002c 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 985 0030 FFF7FEFF 		bl	_tm1637Stop
+ 986              	.LVL95:
+ 154:Src/stm32_tm1637.c **** 
+ 987              		.loc 1 154 1 is_stmt 0 view .LVU183
+ 988 0034 06B0     		add	sp, sp, #24
+ 989              	.LCFI35:
+ 990              		.cfi_def_cfa_offset 8
+ 991              		@ sp needed
+ 992 0036 10BD     		pop	{r4, pc}
+ 154:Src/stm32_tm1637.c **** 
+ 993              		.loc 1 154 1 view .LVU184
+ 994              		.cfi_endproc
+ 995              	.LFE70:
+ 997              		.section	.text.tm1637Init,"ax",%progbits
+ 998              		.align	1
+ 999              		.global	tm1637Init
+ 1000              		.syntax unified
+ 1001              		.thumb
+ 1002              		.thumb_func
+ 1003              		.fpu softvfp
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 25
+
+
+ 1005              	tm1637Init:
+ 1006              	.LFB66:
+  51:Src/stm32_tm1637.c ****     CLK_PORT_CLK_ENABLE();
+ 1007              		.loc 1 51 1 is_stmt 1 view -0
+ 1008              		.cfi_startproc
+ 1009              		@ args = 0, pretend = 0, frame = 40
+ 1010              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1011 0000 10B5     		push	{r4, lr}
+ 1012              	.LCFI36:
+ 1013              		.cfi_def_cfa_offset 8
+ 1014              		.cfi_offset 4, -8
+ 1015              		.cfi_offset 14, -4
+ 1016 0002 8CB0     		sub	sp, sp, #48
+ 1017              	.LCFI37:
+ 1018              		.cfi_def_cfa_offset 56
+ 1019 0004 02AC     		add	r4, sp, #8
+ 1020 0006 84E80F00 		stm	r4, {r0, r1, r2, r3}
+  52:Src/stm32_tm1637.c ****     DIO_PORT_CLK_ENABLE();
+ 1021              		.loc 1 52 5 view .LVU186
+ 1022              	.LBB10:
+  52:Src/stm32_tm1637.c ****     DIO_PORT_CLK_ENABLE();
+ 1023              		.loc 1 52 5 view .LVU187
+  52:Src/stm32_tm1637.c ****     DIO_PORT_CLK_ENABLE();
+ 1024              		.loc 1 52 5 view .LVU188
+ 1025 000a 174B     		ldr	r3, .L57
+ 1026 000c 9A69     		ldr	r2, [r3, #24]
+ 1027 000e 42F00802 		orr	r2, r2, #8
+ 1028 0012 9A61     		str	r2, [r3, #24]
+  52:Src/stm32_tm1637.c ****     DIO_PORT_CLK_ENABLE();
+ 1029              		.loc 1 52 5 view .LVU189
+ 1030 0014 9A69     		ldr	r2, [r3, #24]
+ 1031 0016 02F00802 		and	r2, r2, #8
+ 1032 001a 0692     		str	r2, [sp, #24]
+  52:Src/stm32_tm1637.c ****     DIO_PORT_CLK_ENABLE();
+ 1033              		.loc 1 52 5 view .LVU190
+ 1034 001c 069A     		ldr	r2, [sp, #24]
+ 1035              	.LBE10:
+  52:Src/stm32_tm1637.c ****     DIO_PORT_CLK_ENABLE();
+ 1036              		.loc 1 52 5 view .LVU191
+  53:Src/stm32_tm1637.c ****     GPIO_InitTypeDef g = {0};
+ 1037              		.loc 1 53 5 view .LVU192
+ 1038              	.LBB11:
+  53:Src/stm32_tm1637.c ****     GPIO_InitTypeDef g = {0};
+ 1039              		.loc 1 53 5 view .LVU193
+  53:Src/stm32_tm1637.c ****     GPIO_InitTypeDef g = {0};
+ 1040              		.loc 1 53 5 view .LVU194
+ 1041 001e 9A69     		ldr	r2, [r3, #24]
+ 1042 0020 42F00802 		orr	r2, r2, #8
+ 1043 0024 9A61     		str	r2, [r3, #24]
+  53:Src/stm32_tm1637.c ****     GPIO_InitTypeDef g = {0};
+ 1044              		.loc 1 53 5 view .LVU195
+ 1045 0026 9B69     		ldr	r3, [r3, #24]
+ 1046 0028 03F00803 		and	r3, r3, #8
+ 1047 002c 0793     		str	r3, [sp, #28]
+  53:Src/stm32_tm1637.c ****     GPIO_InitTypeDef g = {0};
+ 1048              		.loc 1 53 5 view .LVU196
+ 1049 002e 079B     		ldr	r3, [sp, #28]
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 26
+
+
+ 1050              	.LBE11:
+  53:Src/stm32_tm1637.c ****     GPIO_InitTypeDef g = {0};
+ 1051              		.loc 1 53 5 view .LVU197
+  54:Src/stm32_tm1637.c ****     g.Pull = GPIO_PULLUP;
+ 1052              		.loc 1 54 5 view .LVU198
+  55:Src/stm32_tm1637.c ****     g.Mode = GPIO_MODE_OUTPUT_OD; // OD = open drain
+ 1053              		.loc 1 55 5 view .LVU199
+  55:Src/stm32_tm1637.c ****     g.Mode = GPIO_MODE_OUTPUT_OD; // OD = open drain
+ 1054              		.loc 1 55 12 is_stmt 0 view .LVU200
+ 1055 0030 0123     		movs	r3, #1
+ 1056 0032 0A93     		str	r3, [sp, #40]
+  56:Src/stm32_tm1637.c ****     g.Speed = GPIO_SPEED_FREQ_HIGH;
+ 1057              		.loc 1 56 5 is_stmt 1 view .LVU201
+  56:Src/stm32_tm1637.c ****     g.Speed = GPIO_SPEED_FREQ_HIGH;
+ 1058              		.loc 1 56 12 is_stmt 0 view .LVU202
+ 1059 0034 1123     		movs	r3, #17
+ 1060 0036 0993     		str	r3, [sp, #36]
+  57:Src/stm32_tm1637.c ****     g.Pin = display.clkPin;
+ 1061              		.loc 1 57 5 is_stmt 1 view .LVU203
+  57:Src/stm32_tm1637.c ****     g.Pin = display.clkPin;
+ 1062              		.loc 1 57 13 is_stmt 0 view .LVU204
+ 1063 0038 0323     		movs	r3, #3
+ 1064 003a 0B93     		str	r3, [sp, #44]
+  58:Src/stm32_tm1637.c ****     HAL_GPIO_Init(display.clkPort, &g);
+ 1065              		.loc 1 58 5 is_stmt 1 view .LVU205
+  58:Src/stm32_tm1637.c ****     HAL_GPIO_Init(display.clkPort, &g);
+ 1066              		.loc 1 58 20 is_stmt 0 view .LVU206
+ 1067 003c BDF81430 		ldrh	r3, [sp, #20]
+  58:Src/stm32_tm1637.c ****     HAL_GPIO_Init(display.clkPort, &g);
+ 1068              		.loc 1 58 11 view .LVU207
+ 1069 0040 0893     		str	r3, [sp, #32]
+  59:Src/stm32_tm1637.c ****     g.Pin = display.dioPin;
+ 1070              		.loc 1 59 5 is_stmt 1 view .LVU208
+ 1071 0042 08A9     		add	r1, sp, #32
+ 1072 0044 0498     		ldr	r0, [sp, #16]
+ 1073 0046 FFF7FEFF 		bl	HAL_GPIO_Init
+ 1074              	.LVL96:
+  60:Src/stm32_tm1637.c ****     HAL_GPIO_Init(display.dioPort, &g);
+ 1075              		.loc 1 60 5 view .LVU209
+  60:Src/stm32_tm1637.c ****     HAL_GPIO_Init(display.dioPort, &g);
+ 1076              		.loc 1 60 20 is_stmt 0 view .LVU210
+ 1077 004a BDF80C30 		ldrh	r3, [sp, #12]
+  60:Src/stm32_tm1637.c ****     HAL_GPIO_Init(display.dioPort, &g);
+ 1078              		.loc 1 60 11 view .LVU211
+ 1079 004e 0893     		str	r3, [sp, #32]
+  61:Src/stm32_tm1637.c ****     tm1637SetBrightness(display, 8);
+ 1080              		.loc 1 61 5 is_stmt 1 view .LVU212
+ 1081 0050 08A9     		add	r1, sp, #32
+ 1082 0052 0298     		ldr	r0, [sp, #8]
+ 1083 0054 FFF7FEFF 		bl	HAL_GPIO_Init
+ 1084              	.LVL97:
+  62:Src/stm32_tm1637.c **** }
+ 1085              		.loc 1 62 5 view .LVU213
+ 1086 0058 0823     		movs	r3, #8
+ 1087 005a 0093     		str	r3, [sp]
+ 1088 005c 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 1089 0060 FFF7FEFF 		bl	tm1637SetBrightness
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 27
+
+
+ 1090              	.LVL98:
+  63:Src/stm32_tm1637.c **** 
+ 1091              		.loc 1 63 1 is_stmt 0 view .LVU214
+ 1092 0064 0CB0     		add	sp, sp, #48
+ 1093              	.LCFI38:
+ 1094              		.cfi_def_cfa_offset 8
+ 1095              		@ sp needed
+ 1096 0066 10BD     		pop	{r4, pc}
+ 1097              	.L58:
+ 1098              		.align	2
+ 1099              	.L57:
+ 1100 0068 00100240 		.word	1073876992
+ 1101              		.cfi_endproc
+ 1102              	.LFE66:
+ 1104              		.global	segmentMap
+ 1105              		.global	wordSegmentMap
+ 1106              		.global	display
+ 1107              		.section	.data.display,"aw"
+ 1108              		.align	2
+ 1111              	display:
+ 1112 0000 000C0140 		.word	1073810432
+ 1113 0004 0008     		.short	2048
+ 1114 0006 0000     		.space	2
+ 1115 0008 000C0140 		.word	1073810432
+ 1116 000c 0004     		.short	1024
+ 1117 000e 0000     		.space	2
+ 1118 0010 000C0140 		.word	1073810432
+ 1119 0014 0002     		.short	512
+ 1120 0016 0000     		.space	2
+ 1121 0018 000C0140 		.word	1073810432
+ 1122 001c 0001     		.short	256
+ 1123 001e 0000     		.space	2
+ 1124              		.section	.rodata.segmentMap,"a"
+ 1125              		.align	2
+ 1126              		.set	.LANCHOR0,. + 0
+ 1129              	segmentMap:
+ 1130 0000 3F065B4F 		.ascii	"?\006[Ofm}\007\177ow|9^yq\000"
+ 1130      666D7D07 
+ 1130      7F6F777C 
+ 1130      395E7971 
+ 1130      00
+ 1131              		.section	.rodata.wordSegmentMap,"a"
+ 1132              		.align	2
+ 1133              		.set	.LANCHOR1,. + 0
+ 1136              	wordSegmentMap:
+ 1137 0000 6D787750 		.ascii	"mxwP"
+ 1138 0004 78105444 		.ascii	"x\020TD"
+ 1139 0008 7C5C541C 		.ascii	"|\\T\034"
+ 1140 000c 7C50106F 		.ascii	"|P\020o"
+ 1141 0010 00000000 		.ascii	"\000\000\000\000"
+ 1142              		.text
+ 1143              	.Letext0:
+ 1144              		.file 2 "g:\\program files (x86)\\gnu tools arm embedded\\9 2019-q4-major\\arm-none-eabi\\include\
+ 1145              		.file 3 "g:\\program files (x86)\\gnu tools arm embedded\\9 2019-q4-major\\arm-none-eabi\\include\
+ 1146              		.file 4 "Drivers/CMSIS/Include/core_cm3.h"
+ 1147              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
+ 1148              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 28
+
+
+ 1149              		.file 7 "g:\\program files (x86)\\gnu tools arm embedded\\9 2019-q4-major\\arm-none-eabi\\include\
+ 1150              		.file 8 "g:\\program files (x86)\\gnu tools arm embedded\\9 2019-q4-major\\arm-none-eabi\\include\
+ 1151              		.file 9 "g:\\program files (x86)\\gnu tools arm embedded\\9 2019-q4-major\\lib\\gcc\\arm-none-eabi
+ 1152              		.file 10 "g:\\program files (x86)\\gnu tools arm embedded\\9 2019-q4-major\\arm-none-eabi\\include
+ 1153              		.file 11 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
+ 1154              		.file 12 "Inc/stm32_tm1637.h"
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s 			page 29
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32_tm1637.c
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:16     .text._tm1637DelayUsec:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:24     .text._tm1637DelayUsec:00000000 _tm1637DelayUsec
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:77     .text._tm1637ClkHigh:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:84     .text._tm1637ClkHigh:00000000 _tm1637ClkHigh
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:115    .text._tm1637ClkLow:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:122    .text._tm1637ClkLow:00000000 _tm1637ClkLow
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:153    .text._tm1637ReadResult:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:160    .text._tm1637ReadResult:00000000 _tm1637ReadResult
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:206    .text._tm1637DioHigh:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:213    .text._tm1637DioHigh:00000000 _tm1637DioHigh
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:244    .text._tm1637DioLow:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:251    .text._tm1637DioLow:00000000 _tm1637DioLow
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:282    .text._tm1637Start:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:289    .text._tm1637Start:00000000 _tm1637Start
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:331    .text._tm1637Stop:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:338    .text._tm1637Stop:00000000 _tm1637Stop
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:392    .text._tm1637WriteByte:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:399    .text._tm1637WriteByte:00000000 _tm1637WriteByte
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:488    .text.tm1637DisplayDecimal:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:495    .text.tm1637DisplayDecimal:00000000 tm1637DisplayDecimal
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:661    .text.tm1637DisplayDecimal:000000d4 $d
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:667    .text.tm1637DisplayText:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:674    .text.tm1637DisplayText:00000000 tm1637DisplayText
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:805    .text.tm1637DisplayText:0000009c $d
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:810    .text.tm1637DisplayClear:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:817    .text.tm1637DisplayClear:00000000 tm1637DisplayClear
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:942    .text.tm1637SetBrightness:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:949    .text.tm1637SetBrightness:00000000 tm1637SetBrightness
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:998    .text.tm1637Init:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:1005   .text.tm1637Init:00000000 tm1637Init
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:1100   .text.tm1637Init:00000068 $d
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:1129   .rodata.segmentMap:00000000 segmentMap
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:1136   .rodata.wordSegmentMap:00000000 wordSegmentMap
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:1111   .data.display:00000000 display
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:1108   .data.display:00000000 $d
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:1125   .rodata.segmentMap:00000000 $d
+C:\Users\Marcin\AppData\Local\Temp\ccBo8DdT.s:1132   .rodata.wordSegmentMap:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_GPIO_WritePin
+HAL_GPIO_Init

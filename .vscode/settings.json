@@ -1,0 +1,17 @@
+{
+    "stm32-for-vscode.makePath": "make",
+    "stm32-for-vscode.armToolchainPath": "",
+    "cortex-debug.armToolchainPath": "",
+    "stm32-for-vscode.openocdPath": "c:\\Users\\Marcin\\Documents\\Projects\\OpenOCD-20200114-0.10.0\\bin\\openocd.exe",
+    "cortex-debug.openocdPath": "c:\\Users\\Marcin\\Documents\\Projects\\OpenOCD-20200114-0.10.0\\bin\\openocd.exe",
+    "files.associations": {
+        "stm32f1xx_hal.h": "c",
+        "stm32f1xx_hal_gpio.h": "c",
+        "tim.h": "c",
+        "game.h": "c",
+        "stdint.h": "c",
+        "menu.h": "c",
+        "stm32_tm1637.h": "c",
+        "MODE.C": "cpp"
+    }
+}

@@ -1,0 +1,22 @@
+{
+  "configurations": [
+    {
+      "name": "STM32",
+      "includePath": [
+        "Drivers/CMSIS/Device/ST/STM32F1xx/Include",
+        "Drivers/CMSIS/Include",
+        "Drivers/STM32F1xx_HAL_Driver/Inc",
+        "Drivers/STM32F1xx_HAL_Driver/Inc/Legacy",
+        "Inc"
+      ],
+      "defines": [
+        "STM32F103xB",
+        "USE_HAL_DRIVER"
+      ],
+      "compilerPath": "E:\\MINGW\\BIN\\GCC.EXE",
+      "cStandard": "c11",
+      "cppStandard": "c++11"
+    }
+  ],
+  "version": 4
+}

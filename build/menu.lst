@@ -1,0 +1,779 @@
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"menu.c"
+  12              		.text
+  13              	.Ltext0:
+  14              		.cfi_sections	.debug_frame
+  15              		.section	.text.menuInit,"ax",%progbits
+  16              		.align	1
+  17              		.global	menuInit
+  18              		.arch armv7-m
+  19              		.syntax unified
+  20              		.thumb
+  21              		.thumb_func
+  22              		.fpu softvfp
+  24              	menuInit:
+  25              	.LVL0:
+  26              	.LFB66:
+  27              		.file 1 "Src/menu.c"
+   1:Src/menu.c    **** #include "menu.h"
+   2:Src/menu.c    **** 
+   3:Src/menu.c    **** #include "stm32f1xx_hal.h"
+   4:Src/menu.c    **** #include "tim.h"
+   5:Src/menu.c    **** #include "stm32_tm1637.h"
+   6:Src/menu.c    **** #include "game.h"
+   7:Src/menu.c    **** #include "mode.h"
+   8:Src/menu.c    **** 
+   9:Src/menu.c    **** const player_time_t gameTimes[] = {
+  10:Src/menu.c    ****     {2,0}, //0
+  11:Src/menu.c    ****     {3,0}, //1
+  12:Src/menu.c    ****     {4,0}, //2
+  13:Src/menu.c    ****     {5,0}, //3
+  14:Src/menu.c    ****     {10,0}, //4
+  15:Src/menu.c    ****     {15,0}, //5
+  16:Src/menu.c    ****     {20,0}, //6
+  17:Src/menu.c    ****     {30,0}, //7
+  18:Src/menu.c    ****     {60,0}, //8
+  19:Src/menu.c    ****     {90,0} //9
+  20:Src/menu.c    **** };
+  21:Src/menu.c    **** 
+  22:Src/menu.c    **** void menuInit (menu_t *menu) 
+  23:Src/menu.c    **** {
+  28              		.loc 1 23 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		.loc 1 23 1 is_stmt 0 view .LVU1
+  33 0000 10B5     		push	{r4, lr}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 8
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s 			page 2
+
+
+  36              		.cfi_offset 4, -8
+  37              		.cfi_offset 14, -4
+  38 0002 82B0     		sub	sp, sp, #8
+  39              	.LCFI1:
+  40              		.cfi_def_cfa_offset 16
+  24:Src/menu.c    ****     mode = MENU;
+  41              		.loc 1 24 5 is_stmt 1 view .LVU2
+  42              		.loc 1 24 10 is_stmt 0 view .LVU3
+  43 0004 0023     		movs	r3, #0
+  44 0006 0B4A     		ldr	r2, .L3
+  45 0008 1370     		strb	r3, [r2]
+  25:Src/menu.c    **** 
+  26:Src/menu.c    ****     //1. Set defulat values
+  27:Src/menu.c    ****     menu->currentOption = 0;
+  46              		.loc 1 27 5 is_stmt 1 view .LVU4
+  47              		.loc 1 27 25 is_stmt 0 view .LVU5
+  48 000a 0370     		strb	r3, [r0]
+  28:Src/menu.c    ****     menu->bonusSeconds = 0;
+  49              		.loc 1 28 5 is_stmt 1 view .LVU6
+  50              		.loc 1 28 24 is_stmt 0 view .LVU7
+  51 000c 4370     		strb	r3, [r0, #1]
+  29:Src/menu.c    ****     menu->selectedTime = 5;
+  52              		.loc 1 29 5 is_stmt 1 view .LVU8
+  53              		.loc 1 29 24 is_stmt 0 view .LVU9
+  54 000e 0523     		movs	r3, #5
+  55 0010 8370     		strb	r3, [r0, #2]
+  30:Src/menu.c    ****     menu->brightness = 8;
+  56              		.loc 1 30 5 is_stmt 1 view .LVU10
+  57              		.loc 1 30 22 is_stmt 0 view .LVU11
+  58 0012 0823     		movs	r3, #8
+  59 0014 C370     		strb	r3, [r0, #3]
+  31:Src/menu.c    **** 
+  32:Src/menu.c    ****     tm1637DisplayText(display[0], menu->currentOption);
+  60              		.loc 1 32 5 is_stmt 1 view .LVU12
+  61              		.loc 1 32 39 is_stmt 0 view .LVU13
+  62 0016 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+  63              		.loc 1 32 5 view .LVU14
+  64 0018 074C     		ldr	r4, .L3+4
+  65 001a 0093     		str	r3, [sp]
+  66 001c 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+  67              	.LVL1:
+  68              		.loc 1 32 5 view .LVU15
+  69 0020 FFF7FEFF 		bl	tm1637DisplayText
+  70              	.LVL2:
+  33:Src/menu.c    ****     tm1637DisplayClear(display[1]);
+  71              		.loc 1 33 5 is_stmt 1 view .LVU16
+  72 0024 1034     		adds	r4, r4, #16
+  73 0026 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+  74 002a FFF7FEFF 		bl	tm1637DisplayClear
+  75              	.LVL3:
+  34:Src/menu.c    **** }
+  76              		.loc 1 34 1 is_stmt 0 view .LVU17
+  77 002e 02B0     		add	sp, sp, #8
+  78              	.LCFI2:
+  79              		.cfi_def_cfa_offset 8
+  80              		@ sp needed
+  81 0030 10BD     		pop	{r4, pc}
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s 			page 3
+
+
+  82              	.L4:
+  83 0032 00BF     		.align	2
+  84              	.L3:
+  85 0034 00000000 		.word	mode
+  86 0038 00000000 		.word	display
+  87              		.cfi_endproc
+  88              	.LFE66:
+  90              		.section	.text.nextMenuOption,"ax",%progbits
+  91              		.align	1
+  92              		.global	nextMenuOption
+  93              		.syntax unified
+  94              		.thumb
+  95              		.thumb_func
+  96              		.fpu softvfp
+  98              	nextMenuOption:
+  99              	.LVL4:
+ 100              	.LFB67:
+  35:Src/menu.c    **** 
+  36:Src/menu.c    **** void nextMenuOption (menu_t *menu) 
+  37:Src/menu.c    **** {
+ 101              		.loc 1 37 1 is_stmt 1 view -0
+ 102              		.cfi_startproc
+ 103              		@ args = 0, pretend = 0, frame = 0
+ 104              		@ frame_needed = 0, uses_anonymous_args = 0
+ 105              		.loc 1 37 1 is_stmt 0 view .LVU19
+ 106 0000 70B5     		push	{r4, r5, r6, lr}
+ 107              	.LCFI3:
+ 108              		.cfi_def_cfa_offset 16
+ 109              		.cfi_offset 4, -16
+ 110              		.cfi_offset 5, -12
+ 111              		.cfi_offset 6, -8
+ 112              		.cfi_offset 14, -4
+ 113 0002 82B0     		sub	sp, sp, #8
+ 114              	.LCFI4:
+ 115              		.cfi_def_cfa_offset 24
+ 116 0004 0446     		mov	r4, r0
+  38:Src/menu.c    ****     //1. Set next option
+  39:Src/menu.c    ****     menu->currentOption++;
+ 117              		.loc 1 39 5 is_stmt 1 view .LVU20
+ 118              		.loc 1 39 9 is_stmt 0 view .LVU21
+ 119 0006 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 120              		.loc 1 39 24 view .LVU22
+ 121 0008 0133     		adds	r3, r3, #1
+ 122 000a DBB2     		uxtb	r3, r3
+ 123 000c 0370     		strb	r3, [r0]
+  40:Src/menu.c    ****     if (menu->currentOption > MENU_OPTIONS - 1) menu->currentOption = 0;
+ 124              		.loc 1 40 5 is_stmt 1 view .LVU23
+ 125              		.loc 1 40 13 is_stmt 0 view .LVU24
+ 126 000e 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 127 0010 DBB2     		uxtb	r3, r3
+ 128              		.loc 1 40 8 view .LVU25
+ 129 0012 032B     		cmp	r3, #3
+ 130 0014 01D9     		bls	.L6
+ 131              		.loc 1 40 49 is_stmt 1 discriminator 1 view .LVU26
+ 132              		.loc 1 40 69 is_stmt 0 discriminator 1 view .LVU27
+ 133 0016 0023     		movs	r3, #0
+ 134 0018 0370     		strb	r3, [r0]
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s 			page 4
+
+
+ 135              	.L6:
+  41:Src/menu.c    **** 
+  42:Src/menu.c    ****     switch (menu->currentOption)
+ 136              		.loc 1 42 5 is_stmt 1 view .LVU28
+ 137              		.loc 1 42 17 is_stmt 0 view .LVU29
+ 138 001a 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 139 001c DBB2     		uxtb	r3, r3
+ 140 001e 032B     		cmp	r3, #3
+ 141 0020 11D8     		bhi	.L5
+ 142 0022 DFE803F0 		tbb	[pc, r3]
+ 143              	.L9:
+ 144 0026 02       		.byte	(.L12-.L9)/2
+ 145 0027 12       		.byte	(.L11-.L9)/2
+ 146 0028 2C       		.byte	(.L10-.L9)/2
+ 147 0029 3D       		.byte	(.L8-.L9)/2
+ 148              		.p2align 1
+ 149              	.L12:
+  43:Src/menu.c    ****     {
+  44:Src/menu.c    ****     case START_GAME:
+  45:Src/menu.c    ****         tm1637DisplayText(display[0], START_GAME);
+ 150              		.loc 1 45 9 is_stmt 1 view .LVU30
+ 151 002a 264C     		ldr	r4, .L14
+ 152 002c 0023     		movs	r3, #0
+ 153 002e 0093     		str	r3, [sp]
+ 154 0030 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 155              	.LVL5:
+ 156              		.loc 1 45 9 is_stmt 0 view .LVU31
+ 157 0034 FFF7FEFF 		bl	tm1637DisplayText
+ 158              	.LVL6:
+  46:Src/menu.c    ****         tm1637DisplayText(display[1], 4);
+ 159              		.loc 1 46 9 is_stmt 1 view .LVU32
+ 160 0038 0423     		movs	r3, #4
+ 161 003a 0093     		str	r3, [sp]
+ 162 003c 1034     		adds	r4, r4, #16
+ 163 003e 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 164 0042 FFF7FEFF 		bl	tm1637DisplayText
+ 165              	.LVL7:
+  47:Src/menu.c    ****         break;
+ 166              		.loc 1 47 9 view .LVU33
+ 167              	.L5:
+  48:Src/menu.c    **** 
+  49:Src/menu.c    ****     case GAME_TIME:
+  50:Src/menu.c    ****         tm1637DisplayText(display[0], GAME_TIME);
+  51:Src/menu.c    ****         tm1637DisplayDecimal(display[1], gameTimes[menu->selectedTime].minutes*100 + gameTimes[menu
+  52:Src/menu.c    ****         break;
+  53:Src/menu.c    **** 
+  54:Src/menu.c    ****     case BONUS_TIME:
+  55:Src/menu.c    ****         tm1637DisplayText(display[0], BONUS_TIME);
+  56:Src/menu.c    ****         tm1637DisplayDecimal(display[1], menu->bonusSeconds, 0);
+  57:Src/menu.c    ****         break;
+  58:Src/menu.c    **** 
+  59:Src/menu.c    ****     case BRIGHTNESS:
+  60:Src/menu.c    ****         tm1637DisplayText(display[0], BRIGHTNESS);
+  61:Src/menu.c    ****         tm1637DisplayDecimal(display[1], menu->brightness, 0);
+  62:Src/menu.c    ****         break;
+  63:Src/menu.c    **** 
+  64:Src/menu.c    ****     default:
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s 			page 5
+
+
+  65:Src/menu.c    ****         break;
+  66:Src/menu.c    ****     }
+  67:Src/menu.c    **** }
+ 168              		.loc 1 67 1 is_stmt 0 view .LVU34
+ 169 0046 02B0     		add	sp, sp, #8
+ 170              	.LCFI5:
+ 171              		.cfi_remember_state
+ 172              		.cfi_def_cfa_offset 16
+ 173              		@ sp needed
+ 174 0048 70BD     		pop	{r4, r5, r6, pc}
+ 175              	.LVL8:
+ 176              	.L11:
+ 177              	.LCFI6:
+ 178              		.cfi_restore_state
+  50:Src/menu.c    ****         tm1637DisplayDecimal(display[1], gameTimes[menu->selectedTime].minutes*100 + gameTimes[menu
+ 179              		.loc 1 50 9 is_stmt 1 view .LVU35
+ 180 004a 1E4D     		ldr	r5, .L14
+ 181 004c 0126     		movs	r6, #1
+ 182 004e 0096     		str	r6, [sp]
+ 183 0050 95E80F00 		ldm	r5, {r0, r1, r2, r3}
+ 184              	.LVL9:
+  50:Src/menu.c    ****         tm1637DisplayDecimal(display[1], gameTimes[menu->selectedTime].minutes*100 + gameTimes[menu
+ 185              		.loc 1 50 9 is_stmt 0 view .LVU36
+ 186 0054 FFF7FEFF 		bl	tm1637DisplayText
+ 187              	.LVL10:
+  51:Src/menu.c    ****         break;
+ 188              		.loc 1 51 9 is_stmt 1 view .LVU37
+  51:Src/menu.c    ****         break;
+ 189              		.loc 1 51 56 is_stmt 0 view .LVU38
+ 190 0058 A278     		ldrb	r2, [r4, #2]	@ zero_extendqisi2
+  51:Src/menu.c    ****         break;
+ 191              		.loc 1 51 71 view .LVU39
+ 192 005a 1B4B     		ldr	r3, .L14+4
+ 193 005c 13F81220 		ldrb	r2, [r3, r2, lsl #1]	@ zero_extendqisi2
+  51:Src/menu.c    ****         break;
+ 194              		.loc 1 51 100 view .LVU40
+ 195 0060 A178     		ldrb	r1, [r4, #2]	@ zero_extendqisi2
+  51:Src/menu.c    ****         break;
+ 196              		.loc 1 51 115 view .LVU41
+ 197 0062 03EB4103 		add	r3, r3, r1, lsl #1
+ 198 0066 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+  51:Src/menu.c    ****         break;
+ 199              		.loc 1 51 9 view .LVU42
+ 200 0068 0196     		str	r6, [sp, #4]
+ 201 006a 6421     		movs	r1, #100
+ 202 006c 01FB0233 		mla	r3, r1, r2, r3
+ 203 0070 0093     		str	r3, [sp]
+ 204 0072 1035     		adds	r5, r5, #16
+ 205 0074 95E80F00 		ldm	r5, {r0, r1, r2, r3}
+ 206 0078 FFF7FEFF 		bl	tm1637DisplayDecimal
+ 207              	.LVL11:
+  52:Src/menu.c    **** 
+ 208              		.loc 1 52 9 is_stmt 1 view .LVU43
+ 209 007c E3E7     		b	.L5
+ 210              	.LVL12:
+ 211              	.L10:
+  55:Src/menu.c    ****         tm1637DisplayDecimal(display[1], menu->bonusSeconds, 0);
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s 			page 6
+
+
+ 212              		.loc 1 55 9 view .LVU44
+ 213 007e 114D     		ldr	r5, .L14
+ 214 0080 0223     		movs	r3, #2
+ 215 0082 0093     		str	r3, [sp]
+ 216 0084 95E80F00 		ldm	r5, {r0, r1, r2, r3}
+ 217              	.LVL13:
+  55:Src/menu.c    ****         tm1637DisplayDecimal(display[1], menu->bonusSeconds, 0);
+ 218              		.loc 1 55 9 is_stmt 0 view .LVU45
+ 219 0088 FFF7FEFF 		bl	tm1637DisplayText
+ 220              	.LVL14:
+  56:Src/menu.c    ****         break;
+ 221              		.loc 1 56 9 is_stmt 1 view .LVU46
+  56:Src/menu.c    ****         break;
+ 222              		.loc 1 56 46 is_stmt 0 view .LVU47
+ 223 008c 6378     		ldrb	r3, [r4, #1]	@ zero_extendqisi2
+  56:Src/menu.c    ****         break;
+ 224              		.loc 1 56 9 view .LVU48
+ 225 008e 0022     		movs	r2, #0
+ 226 0090 0192     		str	r2, [sp, #4]
+ 227 0092 0093     		str	r3, [sp]
+ 228 0094 1035     		adds	r5, r5, #16
+ 229 0096 95E80F00 		ldm	r5, {r0, r1, r2, r3}
+ 230 009a FFF7FEFF 		bl	tm1637DisplayDecimal
+ 231              	.LVL15:
+  57:Src/menu.c    **** 
+ 232              		.loc 1 57 9 is_stmt 1 view .LVU49
+ 233 009e D2E7     		b	.L5
+ 234              	.LVL16:
+ 235              	.L8:
+  60:Src/menu.c    ****         tm1637DisplayDecimal(display[1], menu->brightness, 0);
+ 236              		.loc 1 60 9 view .LVU50
+ 237 00a0 084D     		ldr	r5, .L14
+ 238 00a2 0323     		movs	r3, #3
+ 239 00a4 0093     		str	r3, [sp]
+ 240 00a6 95E80F00 		ldm	r5, {r0, r1, r2, r3}
+ 241              	.LVL17:
+  60:Src/menu.c    ****         tm1637DisplayDecimal(display[1], menu->brightness, 0);
+ 242              		.loc 1 60 9 is_stmt 0 view .LVU51
+ 243 00aa FFF7FEFF 		bl	tm1637DisplayText
+ 244              	.LVL18:
+  61:Src/menu.c    ****         break;
+ 245              		.loc 1 61 9 is_stmt 1 view .LVU52
+  61:Src/menu.c    ****         break;
+ 246              		.loc 1 61 46 is_stmt 0 view .LVU53
+ 247 00ae E378     		ldrb	r3, [r4, #3]	@ zero_extendqisi2
+  61:Src/menu.c    ****         break;
+ 248              		.loc 1 61 9 view .LVU54
+ 249 00b0 0022     		movs	r2, #0
+ 250 00b2 0192     		str	r2, [sp, #4]
+ 251 00b4 0093     		str	r3, [sp]
+ 252 00b6 1035     		adds	r5, r5, #16
+ 253 00b8 95E80F00 		ldm	r5, {r0, r1, r2, r3}
+ 254 00bc FFF7FEFF 		bl	tm1637DisplayDecimal
+ 255              	.LVL19:
+  62:Src/menu.c    **** 
+ 256              		.loc 1 62 9 is_stmt 1 view .LVU55
+ 257              		.loc 1 67 1 is_stmt 0 view .LVU56
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s 			page 7
+
+
+ 258 00c0 C1E7     		b	.L5
+ 259              	.L15:
+ 260 00c2 00BF     		.align	2
+ 261              	.L14:
+ 262 00c4 00000000 		.word	display
+ 263 00c8 00000000 		.word	.LANCHOR0
+ 264              		.cfi_endproc
+ 265              	.LFE67:
+ 267              		.section	.text.setMenuOption,"ax",%progbits
+ 268              		.align	1
+ 269              		.global	setMenuOption
+ 270              		.syntax unified
+ 271              		.thumb
+ 272              		.thumb_func
+ 273              		.fpu softvfp
+ 275              	setMenuOption:
+ 276              	.LVL20:
+ 277              	.LFB68:
+  68:Src/menu.c    **** 
+  69:Src/menu.c    **** void setMenuOption (menu_t *menu) 
+  70:Src/menu.c    **** {
+ 278              		.loc 1 70 1 is_stmt 1 view -0
+ 279              		.cfi_startproc
+ 280              		@ args = 0, pretend = 0, frame = 0
+ 281              		@ frame_needed = 0, uses_anonymous_args = 0
+ 282              		.loc 1 70 1 is_stmt 0 view .LVU58
+ 283 0000 70B5     		push	{r4, r5, r6, lr}
+ 284              	.LCFI7:
+ 285              		.cfi_def_cfa_offset 16
+ 286              		.cfi_offset 4, -16
+ 287              		.cfi_offset 5, -12
+ 288              		.cfi_offset 6, -8
+ 289              		.cfi_offset 14, -4
+ 290 0002 82B0     		sub	sp, sp, #8
+ 291              	.LCFI8:
+ 292              		.cfi_def_cfa_offset 24
+ 293 0004 0446     		mov	r4, r0
+  71:Src/menu.c    ****     switch (menu->currentOption)
+ 294              		.loc 1 71 5 is_stmt 1 view .LVU59
+ 295              		.loc 1 71 17 is_stmt 0 view .LVU60
+ 296 0006 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 297 0008 DBB2     		uxtb	r3, r3
+ 298 000a 032B     		cmp	r3, #3
+ 299 000c 13D8     		bhi	.L16
+ 300 000e DFE803F0 		tbb	[pc, r3]
+ 301              	.L19:
+ 302 0012 02       		.byte	(.L22-.L19)/2
+ 303 0013 14       		.byte	(.L21-.L19)/2
+ 304 0014 31       		.byte	(.L20-.L19)/2
+ 305 0015 44       		.byte	(.L18-.L19)/2
+ 306              		.p2align 1
+ 307              	.L22:
+  72:Src/menu.c    ****     {
+  73:Src/menu.c    ****     case START_GAME:
+  74:Src/menu.c    ****         game.bonusSeconds = menu->bonusSeconds;
+ 308              		.loc 1 74 9 is_stmt 1 view .LVU61
+ 309              		.loc 1 74 33 is_stmt 0 view .LVU62
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s 			page 8
+
+
+ 310 0016 4378     		ldrb	r3, [r0, #1]	@ zero_extendqisi2
+ 311 0018 DBB2     		uxtb	r3, r3
+ 312              		.loc 1 74 27 view .LVU63
+ 313 001a 3148     		ldr	r0, .L27
+ 314              	.LVL21:
+ 315              		.loc 1 74 27 view .LVU64
+ 316 001c C370     		strb	r3, [r0, #3]
+  75:Src/menu.c    **** 
+  76:Src/menu.c    ****         game.startTime.minutes = gameTimes[menu->selectedTime].minutes;
+ 317              		.loc 1 76 9 is_stmt 1 view .LVU65
+ 318              		.loc 1 76 48 is_stmt 0 view .LVU66
+ 319 001e A278     		ldrb	r2, [r4, #2]	@ zero_extendqisi2
+ 320              		.loc 1 76 63 view .LVU67
+ 321 0020 304B     		ldr	r3, .L27+4
+ 322 0022 13F81220 		ldrb	r2, [r3, r2, lsl #1]	@ zero_extendqisi2
+ 323              		.loc 1 76 32 view .LVU68
+ 324 0026 4270     		strb	r2, [r0, #1]
+  77:Src/menu.c    ****         game.startTime.seconds = gameTimes[menu->selectedTime].seconds;
+ 325              		.loc 1 77 9 is_stmt 1 view .LVU69
+ 326              		.loc 1 77 48 is_stmt 0 view .LVU70
+ 327 0028 A278     		ldrb	r2, [r4, #2]	@ zero_extendqisi2
+ 328              		.loc 1 77 63 view .LVU71
+ 329 002a 03EB4203 		add	r3, r3, r2, lsl #1
+ 330 002e 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 331              		.loc 1 77 32 view .LVU72
+ 332 0030 8370     		strb	r3, [r0, #2]
+  78:Src/menu.c    **** 
+  79:Src/menu.c    ****         gameInit(&game);
+ 333              		.loc 1 79 9 is_stmt 1 view .LVU73
+ 334 0032 FFF7FEFF 		bl	gameInit
+ 335              	.LVL22:
+  80:Src/menu.c    ****         break;
+ 336              		.loc 1 80 9 view .LVU74
+ 337              	.L16:
+  81:Src/menu.c    **** 
+  82:Src/menu.c    ****     case GAME_TIME:
+  83:Src/menu.c    ****         menu->selectedTime++;
+  84:Src/menu.c    ****         if(menu->selectedTime >= GAME_TIMES) menu->selectedTime = 0;
+  85:Src/menu.c    ****         tm1637DisplayDecimal(display[1], gameTimes[menu->selectedTime].minutes*100 + gameTimes[menu
+  86:Src/menu.c    ****         break;
+  87:Src/menu.c    **** 
+  88:Src/menu.c    ****     case BONUS_TIME:
+  89:Src/menu.c    ****         menu->bonusSeconds++;
+  90:Src/menu.c    ****         if (menu->bonusSeconds > MAX_BONUS_TIME) menu->bonusSeconds = 0;
+  91:Src/menu.c    ****         tm1637DisplayDecimal(display[1], menu->bonusSeconds, 0);
+  92:Src/menu.c    ****         break;
+  93:Src/menu.c    **** 
+  94:Src/menu.c    ****     case BRIGHTNESS:
+  95:Src/menu.c    ****         menu->brightness++;
+  96:Src/menu.c    ****         if (menu->brightness > 8) menu->brightness = 1;
+  97:Src/menu.c    ****         tm1637DisplayDecimal(display[1], menu->brightness, 0);
+  98:Src/menu.c    ****         
+  99:Src/menu.c    ****         tm1637SetBrightness(display[0], menu->brightness);
+ 100:Src/menu.c    ****         tm1637SetBrightness(display[1], menu->brightness);
+ 101:Src/menu.c    ****         break;
+ 102:Src/menu.c    **** 
+ 103:Src/menu.c    ****     default:
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s 			page 9
+
+
+ 104:Src/menu.c    ****         break;
+ 105:Src/menu.c    ****     }
+ 106:Src/menu.c    **** }...
+ 338              		.loc 1 106 1 is_stmt 0 view .LVU75
+ 339 0036 02B0     		add	sp, sp, #8
+ 340              	.LCFI9:
+ 341              		.cfi_remember_state
+ 342              		.cfi_def_cfa_offset 16
+ 343              		@ sp needed
+ 344 0038 70BD     		pop	{r4, r5, r6, pc}
+ 345              	.LVL23:
+ 346              	.L21:
+ 347              	.LCFI10:
+ 348              		.cfi_restore_state
+  83:Src/menu.c    ****         menu->selectedTime++;
+ 349              		.loc 1 83 9 is_stmt 1 view .LVU76
+  83:Src/menu.c    ****         menu->selectedTime++;
+ 350              		.loc 1 83 13 is_stmt 0 view .LVU77
+ 351 003a 8378     		ldrb	r3, [r0, #2]	@ zero_extendqisi2
+  83:Src/menu.c    ****         menu->selectedTime++;
+ 352              		.loc 1 83 27 view .LVU78
+ 353 003c 0133     		adds	r3, r3, #1
+ 354 003e DBB2     		uxtb	r3, r3
+ 355 0040 8370     		strb	r3, [r0, #2]
+  84:Src/menu.c    ****         if(menu->selectedTime >= GAME_TIMES) menu->selectedTime = 0;
+ 356              		.loc 1 84 9 is_stmt 1 view .LVU79
+  84:Src/menu.c    ****         if(menu->selectedTime >= GAME_TIMES) menu->selectedTime = 0;
+ 357              		.loc 1 84 16 is_stmt 0 view .LVU80
+ 358 0042 8378     		ldrb	r3, [r0, #2]	@ zero_extendqisi2
+ 359 0044 DBB2     		uxtb	r3, r3
+  84:Src/menu.c    ****         if(menu->selectedTime >= GAME_TIMES) menu->selectedTime = 0;
+ 360              		.loc 1 84 11 view .LVU81
+ 361 0046 092B     		cmp	r3, #9
+ 362 0048 01D9     		bls	.L23
+  84:Src/menu.c    ****         if(menu->selectedTime >= GAME_TIMES) menu->selectedTime = 0;
+ 363              		.loc 1 84 46 is_stmt 1 discriminator 1 view .LVU82
+  84:Src/menu.c    ****         if(menu->selectedTime >= GAME_TIMES) menu->selectedTime = 0;
+ 364              		.loc 1 84 65 is_stmt 0 discriminator 1 view .LVU83
+ 365 004a 0023     		movs	r3, #0
+ 366 004c 8370     		strb	r3, [r0, #2]
+ 367              	.L23:
+  85:Src/menu.c    ****         tm1637DisplayDecimal(display[1], gameTimes[menu->selectedTime].minutes*100 + gameTimes[menu
+ 368              		.loc 1 85 9 is_stmt 1 view .LVU84
+  85:Src/menu.c    ****         tm1637DisplayDecimal(display[1], gameTimes[menu->selectedTime].minutes*100 + gameTimes[menu
+ 369              		.loc 1 85 56 is_stmt 0 view .LVU85
+ 370 004e A278     		ldrb	r2, [r4, #2]	@ zero_extendqisi2
+  85:Src/menu.c    ****         tm1637DisplayDecimal(display[1], gameTimes[menu->selectedTime].minutes*100 + gameTimes[menu
+ 371              		.loc 1 85 71 view .LVU86
+ 372 0050 244B     		ldr	r3, .L27+4
+ 373 0052 13F81220 		ldrb	r2, [r3, r2, lsl #1]	@ zero_extendqisi2
+  85:Src/menu.c    ****         tm1637DisplayDecimal(display[1], gameTimes[menu->selectedTime].minutes*100 + gameTimes[menu
+ 374              		.loc 1 85 100 view .LVU87
+ 375 0056 A178     		ldrb	r1, [r4, #2]	@ zero_extendqisi2
+  85:Src/menu.c    ****         tm1637DisplayDecimal(display[1], gameTimes[menu->selectedTime].minutes*100 + gameTimes[menu
+ 376              		.loc 1 85 115 view .LVU88
+ 377 0058 03EB4103 		add	r3, r3, r1, lsl #1
+ 378 005c 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s 			page 10
+
+
+  85:Src/menu.c    ****         tm1637DisplayDecimal(display[1], gameTimes[menu->selectedTime].minutes*100 + gameTimes[menu
+ 379              		.loc 1 85 9 view .LVU89
+ 380 005e 0121     		movs	r1, #1
+ 381 0060 0191     		str	r1, [sp, #4]
+ 382 0062 6421     		movs	r1, #100
+ 383 0064 01FB0233 		mla	r3, r1, r2, r3
+ 384 0068 0093     		str	r3, [sp]
+ 385 006a 1F4B     		ldr	r3, .L27+8
+ 386 006c 0FCB     		ldm	r3, {r0, r1, r2, r3}
+ 387              	.LVL24:
+  85:Src/menu.c    ****         tm1637DisplayDecimal(display[1], gameTimes[menu->selectedTime].minutes*100 + gameTimes[menu
+ 388              		.loc 1 85 9 view .LVU90
+ 389 006e FFF7FEFF 		bl	tm1637DisplayDecimal
+ 390              	.LVL25:
+  86:Src/menu.c    ****         break;
+ 391              		.loc 1 86 9 is_stmt 1 view .LVU91
+ 392 0072 E0E7     		b	.L16
+ 393              	.LVL26:
+ 394              	.L20:
+  89:Src/menu.c    ****         menu->bonusSeconds++;
+ 395              		.loc 1 89 9 view .LVU92
+  89:Src/menu.c    ****         menu->bonusSeconds++;
+ 396              		.loc 1 89 13 is_stmt 0 view .LVU93
+ 397 0074 4378     		ldrb	r3, [r0, #1]	@ zero_extendqisi2
+  89:Src/menu.c    ****         menu->bonusSeconds++;
+ 398              		.loc 1 89 27 view .LVU94
+ 399 0076 0133     		adds	r3, r3, #1
+ 400 0078 DBB2     		uxtb	r3, r3
+ 401 007a 4370     		strb	r3, [r0, #1]
+  90:Src/menu.c    ****         if (menu->bonusSeconds > MAX_BONUS_TIME) menu->bonusSeconds = 0;
+ 402              		.loc 1 90 9 is_stmt 1 view .LVU95
+  90:Src/menu.c    ****         if (menu->bonusSeconds > MAX_BONUS_TIME) menu->bonusSeconds = 0;
+ 403              		.loc 1 90 17 is_stmt 0 view .LVU96
+ 404 007c 4378     		ldrb	r3, [r0, #1]	@ zero_extendqisi2
+ 405 007e DBB2     		uxtb	r3, r3
+  90:Src/menu.c    ****         if (menu->bonusSeconds > MAX_BONUS_TIME) menu->bonusSeconds = 0;
+ 406              		.loc 1 90 12 view .LVU97
+ 407 0080 0F2B     		cmp	r3, #15
+ 408 0082 01D9     		bls	.L24
+  90:Src/menu.c    ****         if (menu->bonusSeconds > MAX_BONUS_TIME) menu->bonusSeconds = 0;
+ 409              		.loc 1 90 50 is_stmt 1 discriminator 1 view .LVU98
+  90:Src/menu.c    ****         if (menu->bonusSeconds > MAX_BONUS_TIME) menu->bonusSeconds = 0;
+ 410              		.loc 1 90 69 is_stmt 0 discriminator 1 view .LVU99
+ 411 0084 0023     		movs	r3, #0
+ 412 0086 4370     		strb	r3, [r0, #1]
+ 413              	.L24:
+  91:Src/menu.c    ****         tm1637DisplayDecimal(display[1], menu->bonusSeconds, 0);
+ 414              		.loc 1 91 9 is_stmt 1 view .LVU100
+  91:Src/menu.c    ****         tm1637DisplayDecimal(display[1], menu->bonusSeconds, 0);
+ 415              		.loc 1 91 46 is_stmt 0 view .LVU101
+ 416 0088 6378     		ldrb	r3, [r4, #1]	@ zero_extendqisi2
+  91:Src/menu.c    ****         tm1637DisplayDecimal(display[1], menu->bonusSeconds, 0);
+ 417              		.loc 1 91 9 view .LVU102
+ 418 008a 0022     		movs	r2, #0
+ 419 008c 0192     		str	r2, [sp, #4]
+ 420 008e 0093     		str	r3, [sp]
+ 421 0090 154B     		ldr	r3, .L27+8
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s 			page 11
+
+
+ 422 0092 0FCB     		ldm	r3, {r0, r1, r2, r3}
+ 423              	.LVL27:
+  91:Src/menu.c    ****         tm1637DisplayDecimal(display[1], menu->bonusSeconds, 0);
+ 424              		.loc 1 91 9 view .LVU103
+ 425 0094 FFF7FEFF 		bl	tm1637DisplayDecimal
+ 426              	.LVL28:
+  92:Src/menu.c    ****         break;
+ 427              		.loc 1 92 9 is_stmt 1 view .LVU104
+ 428 0098 CDE7     		b	.L16
+ 429              	.LVL29:
+ 430              	.L18:
+  95:Src/menu.c    ****         menu->brightness++;
+ 431              		.loc 1 95 9 view .LVU105
+  95:Src/menu.c    ****         menu->brightness++;
+ 432              		.loc 1 95 13 is_stmt 0 view .LVU106
+ 433 009a C378     		ldrb	r3, [r0, #3]	@ zero_extendqisi2
+  95:Src/menu.c    ****         menu->brightness++;
+ 434              		.loc 1 95 25 view .LVU107
+ 435 009c 0133     		adds	r3, r3, #1
+ 436 009e DBB2     		uxtb	r3, r3
+ 437 00a0 C370     		strb	r3, [r0, #3]
+  96:Src/menu.c    ****         if (menu->brightness > 8) menu->brightness = 1;
+ 438              		.loc 1 96 9 is_stmt 1 view .LVU108
+  96:Src/menu.c    ****         if (menu->brightness > 8) menu->brightness = 1;
+ 439              		.loc 1 96 17 is_stmt 0 view .LVU109
+ 440 00a2 C378     		ldrb	r3, [r0, #3]	@ zero_extendqisi2
+ 441 00a4 DBB2     		uxtb	r3, r3
+  96:Src/menu.c    ****         if (menu->brightness > 8) menu->brightness = 1;
+ 442              		.loc 1 96 12 view .LVU110
+ 443 00a6 082B     		cmp	r3, #8
+ 444 00a8 01D9     		bls	.L25
+  96:Src/menu.c    ****         if (menu->brightness > 8) menu->brightness = 1;
+ 445              		.loc 1 96 35 is_stmt 1 discriminator 1 view .LVU111
+  96:Src/menu.c    ****         if (menu->brightness > 8) menu->brightness = 1;
+ 446              		.loc 1 96 52 is_stmt 0 discriminator 1 view .LVU112
+ 447 00aa 0123     		movs	r3, #1
+ 448 00ac C370     		strb	r3, [r0, #3]
+ 449              	.L25:
+  97:Src/menu.c    ****         tm1637DisplayDecimal(display[1], menu->brightness, 0);
+ 450              		.loc 1 97 9 is_stmt 1 view .LVU113
+  97:Src/menu.c    ****         tm1637DisplayDecimal(display[1], menu->brightness, 0);
+ 451              		.loc 1 97 46 is_stmt 0 view .LVU114
+ 452 00ae E378     		ldrb	r3, [r4, #3]	@ zero_extendqisi2
+  97:Src/menu.c    ****         tm1637DisplayDecimal(display[1], menu->brightness, 0);
+ 453              		.loc 1 97 9 view .LVU115
+ 454 00b0 0E4E     		ldr	r6, .L27+12
+ 455 00b2 0022     		movs	r2, #0
+ 456 00b4 0192     		str	r2, [sp, #4]
+ 457 00b6 0093     		str	r3, [sp]
+ 458 00b8 06F11005 		add	r5, r6, #16
+ 459 00bc 95E80F00 		ldm	r5, {r0, r1, r2, r3}
+ 460              	.LVL30:
+  97:Src/menu.c    ****         tm1637DisplayDecimal(display[1], menu->brightness, 0);
+ 461              		.loc 1 97 9 view .LVU116
+ 462 00c0 FFF7FEFF 		bl	tm1637DisplayDecimal
+ 463              	.LVL31:
+  99:Src/menu.c    ****         tm1637SetBrightness(display[0], menu->brightness);
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s 			page 12
+
+
+ 464              		.loc 1 99 9 is_stmt 1 view .LVU117
+  99:Src/menu.c    ****         tm1637SetBrightness(display[0], menu->brightness);
+ 465              		.loc 1 99 45 is_stmt 0 view .LVU118
+ 466 00c4 E378     		ldrb	r3, [r4, #3]	@ zero_extendqisi2
+  99:Src/menu.c    ****         tm1637SetBrightness(display[0], menu->brightness);
+ 467              		.loc 1 99 9 view .LVU119
+ 468 00c6 0093     		str	r3, [sp]
+ 469 00c8 96E80F00 		ldm	r6, {r0, r1, r2, r3}
+ 470 00cc FFF7FEFF 		bl	tm1637SetBrightness
+ 471              	.LVL32:
+ 100:Src/menu.c    ****         tm1637SetBrightness(display[1], menu->brightness);
+ 472              		.loc 1 100 9 is_stmt 1 view .LVU120
+ 100:Src/menu.c    ****         tm1637SetBrightness(display[1], menu->brightness);
+ 473              		.loc 1 100 45 is_stmt 0 view .LVU121
+ 474 00d0 E378     		ldrb	r3, [r4, #3]	@ zero_extendqisi2
+ 100:Src/menu.c    ****         tm1637SetBrightness(display[1], menu->brightness);
+ 475              		.loc 1 100 9 view .LVU122
+ 476 00d2 0093     		str	r3, [sp]
+ 477 00d4 95E80F00 		ldm	r5, {r0, r1, r2, r3}
+ 478 00d8 FFF7FEFF 		bl	tm1637SetBrightness
+ 479              	.LVL33:
+ 101:Src/menu.c    ****         break;
+ 480              		.loc 1 101 9 is_stmt 1 view .LVU123
+ 481              		.loc 1 106 1 is_stmt 0 view .LVU124
+ 482 00dc ABE7     		b	.L16
+ 483              	.L28:
+ 484 00de 00BF     		.align	2
+ 485              	.L27:
+ 486 00e0 00000000 		.word	game
+ 487 00e4 00000000 		.word	.LANCHOR0
+ 488 00e8 10000000 		.word	display+16
+ 489 00ec 00000000 		.word	display
+ 490              		.cfi_endproc
+ 491              	.LFE68:
+ 493              		.global	gameTimes
+ 494              		.comm	mode,1,1
+ 495              		.comm	game,9,4
+ 496              		.comm	display,32,4
+ 497              		.comm	menu,4,4
+ 498              		.section	.rodata.gameTimes,"a"
+ 499              		.align	2
+ 500              		.set	.LANCHOR0,. + 0
+ 503              	gameTimes:
+ 504 0000 02       		.byte	2
+ 505 0001 00       		.byte	0
+ 506 0002 03       		.byte	3
+ 507 0003 00       		.byte	0
+ 508 0004 04       		.byte	4
+ 509 0005 00       		.byte	0
+ 510 0006 05       		.byte	5
+ 511 0007 00       		.byte	0
+ 512 0008 0A       		.byte	10
+ 513 0009 00       		.byte	0
+ 514 000a 0F       		.byte	15
+ 515 000b 00       		.byte	0
+ 516 000c 14       		.byte	20
+ 517 000d 00       		.byte	0
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s 			page 13
+
+
+ 518 000e 1E       		.byte	30
+ 519 000f 00       		.byte	0
+ 520 0010 3C       		.byte	60
+ 521 0011 00       		.byte	0
+ 522 0012 5A       		.byte	90
+ 523 0013 00       		.byte	0
+ 524              		.text
+ 525              	.Letext0:
+ 526              		.file 2 "g:\\program files (x86)\\gnu tools arm embedded\\9 2019-q4-major\\arm-none-eabi\\include\
+ 527              		.file 3 "g:\\program files (x86)\\gnu tools arm embedded\\9 2019-q4-major\\arm-none-eabi\\include\
+ 528              		.file 4 "Inc/menu.h"
+ 529              		.file 5 "Drivers/CMSIS/Include/core_cm3.h"
+ 530              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
+ 531              		.file 7 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 532              		.file 8 "g:\\program files (x86)\\gnu tools arm embedded\\9 2019-q4-major\\arm-none-eabi\\include\
+ 533              		.file 9 "g:\\program files (x86)\\gnu tools arm embedded\\9 2019-q4-major\\arm-none-eabi\\include\
+ 534              		.file 10 "g:\\program files (x86)\\gnu tools arm embedded\\9 2019-q4-major\\lib\\gcc\\arm-none-eab
+ 535              		.file 11 "g:\\program files (x86)\\gnu tools arm embedded\\9 2019-q4-major\\arm-none-eabi\\include
+ 536              		.file 12 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
+ 537              		.file 13 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
+ 538              		.file 14 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h"
+ 539              		.file 15 "Inc/tim.h"
+ 540              		.file 16 "Inc/stm32_tm1637.h"
+ 541              		.file 17 "Inc/game.h"
+ 542              		.file 18 "Inc/mode.h"
+ARM GAS  C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s 			page 14
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 menu.c
+C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s:16     .text.menuInit:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s:24     .text.menuInit:00000000 menuInit
+C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s:85     .text.menuInit:00000034 $d
+                            *COM*:00000001 mode
+                            *COM*:00000020 display
+C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s:91     .text.nextMenuOption:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s:98     .text.nextMenuOption:00000000 nextMenuOption
+C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s:144    .text.nextMenuOption:00000026 $d
+C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s:148    .text.nextMenuOption:0000002a $t
+C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s:262    .text.nextMenuOption:000000c4 $d
+C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s:268    .text.setMenuOption:00000000 $t
+C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s:275    .text.setMenuOption:00000000 setMenuOption
+C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s:302    .text.setMenuOption:00000012 $d
+C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s:306    .text.setMenuOption:00000016 $t
+C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s:486    .text.setMenuOption:000000e0 $d
+                            *COM*:00000009 game
+C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s:503    .rodata.gameTimes:00000000 gameTimes
+                            *COM*:00000004 menu
+C:\Users\Marcin\AppData\Local\Temp\cco0gjDd.s:499    .rodata.gameTimes:00000000 $d
+
+UNDEFINED SYMBOLS
+tm1637DisplayText
+tm1637DisplayClear
+tm1637DisplayDecimal
+gameInit
+tm1637SetBrightness
